@@ -1,0 +1,11 @@
+This file describes API changes in /question/type/minispeak/*.
+
+=== 3.10 ===
+* The label for the Minispeak answers are being removed and the inputs (radio buttons/checkboxes) are now being labelled
+by the answer texts via the aria-labelledby attribute. Because of this, Behat steps that used to click on the labels for the
+Minispeak answer such as
+    And I click on "One" "checkbox"
+won't work anymore. This has been replaced by having Behat click on the answer text using the custom partial named selector
+"qtype_minispeak > Answer". So the above behat step would now be
+    And I click on "One" "qtype_minispeak > Answer"
+This applies to both single-answer and multiple-answer Minispeak question types.
