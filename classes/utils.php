@@ -1285,7 +1285,7 @@ class utils{
 
    }
 
-   public static function fetch_item_from_itemrecord($itemrecord,$moduleinstance, $context=false){
+   public static function fetch_item_from_itemrecord($itemrecord,$moduleinstance, $context){
        //Set up the item type specific parts of the form data
        switch($itemrecord->type){
            case constants::TYPE_MULTICHOICE: return new local\itemtype\item_multichoice($itemrecord,$moduleinstance,$context);

@@ -125,13 +125,46 @@ abstract class baseform  {
         $this->filemanageroptions =[];// $this->_customdata['filemanageroptions'];
     }
 
-    public function add_element($element) {
+    public function addElement($theelement) {
+        if (is_object($theelement)) {
+            $element = &$theelement;
+
+        } else {
+            $args = func_get_args();
+            $element = call_user_func_array([$this->_form, 'createElement'], $args);
+        }
+
         if(empty($this->elementbeforename)) {
-            $this->_form->addElement($element);
+           return $this->_form->addElement($element);
         }else{
-            $this->_form->insertElementBefore($element,$this->elementbeforename);
+           return $this->_form->insertElementBefore($element,$this->elementbeforename);
         }
     }
+
+    /**
+     * Adds an element group
+     * @param    array      $elements       array of elements composing the group
+     * @param    string     $name           (optional)group name
+     * @param    string     $groupLabel     (optional)group label
+     * @param    string     $separator      (optional)string to separate elements
+     * @param    string     $appendName     (optional)specify whether the group name should be
+     *                                      used in the form element name ex: group[element]
+     * @return   object     reference to added group of elements
+     * @since    2.8
+     * @access   public
+     * @throws   PEAR_Error
+     */
+    function addGroup($elements, $name=null, $groupLabel='', $separator=null, $appendName = true)
+    {
+        static $anonGroups = 1;
+
+        if (0 == strlen($name)) {
+            $name       = 'qf_group_' . $anonGroups++;
+            $appendName = false;
+        }
+        $group =$this->addElement('group', $name, $groupLabel, $elements, $separator, $appendName);
+        return $group;
+    } // end func addGroup
 
     /**
      * Add the required basic elements to the form.
@@ -144,22 +177,23 @@ abstract class baseform  {
 
         $m35 = $CFG->version >= 2018051700;
         $mform = $this->_form;
-	
-        $mform->addElement('header', 'typeheading', get_string('createaitem', constants::M_COMPONENT, get_string($this->type, constants::M_COMPONENT)));
 
-        $mform->addElement('hidden', 'id');
+        // we do not need this heading, though in MiniLesson we do
+       // $this->addElement('header', 'typeheading', get_string('createaitem', constants::M_COMPONENT, get_string($this->type, constants::M_COMPONENT)));
+
+        $this->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INT);
 
-        $mform->addElement('hidden', 'itemid');
+        $this->addElement('hidden', 'itemid');
         $mform->setType('itemid', PARAM_INT);
 
         if ($this->standard === true) {
-         //   $mform->addElement('hidden', 'type');
+         //   $this->addElement('hidden', 'type');
          //   $mform->setType('type', PARAM_TEXT);
 			
 
 
-            $mform->addElement('text', 'name', get_string('itemtitle', constants::M_COMPONENT), array('size'=>70));
+            $this->addElement('text', 'name', get_string('itemtitle', constants::M_COMPONENT), array('size'=>70));
             $mform->setType('name', PARAM_TEXT);
             $mform->addRule('name', get_string('required'), 'required', null, 'client');
             $typelabel =get_string($this->type,constants::M_COMPONENT);
@@ -168,11 +202,11 @@ abstract class baseform  {
 
 
                 //Question instructions
-                $mform->addElement('text', constants::TEXTINSTRUCTIONS, get_string('iteminstructions', constants::M_COMPONENT), array('size'=>70));
+                $this->addElement('text', constants::TEXTINSTRUCTIONS, get_string('iteminstructions', constants::M_COMPONENT), array('size'=>70));
                 $mform->setType(constants::TEXTINSTRUCTIONS, PARAM_RAW);
 
                 //Question text
-                $mform->addElement('textarea', constants::TEXTQUESTION, get_string('itemcontents', constants::M_COMPONENT), array('wrap'=>'virtual','style'=>'width: 100%;'));
+                $this->addElement('textarea', constants::TEXTQUESTION, get_string('itemcontents', constants::M_COMPONENT), array('wrap'=>'virtual','style'=>'width: 100%;'));
                 $mform->setType(constants::TEXTQUESTION, PARAM_RAW);
                 //add layout
                 $this->add_layoutoptions();
@@ -256,7 +290,7 @@ abstract class baseform  {
                 $togglearray[] =& $mform->createElement('advcheckbox','addyoutubeclip',get_string('addyoutubeclip',constants::M_COMPONENT),'');
                 $togglearray[] =& $mform->createElement('advcheckbox','addttsdialog',get_string('addttsdialog',constants::M_COMPONENT),'');
                 $togglearray[] =& $mform->createElement('advcheckbox','addttspassage',get_string('addttspassage',constants::M_COMPONENT),'');
-                $mform->addGroup($togglearray, 'togglearray', get_string('mediaprompts', constants::M_COMPONENT), array(' '), false);
+                $this->addGroup($togglearray, 'togglearray', get_string('mediaprompts', constants::M_COMPONENT), array(' '), false);
                 //in the case of page we assume they will want to use some media
                 if($this->type== constants::TYPE_PAGE) {
                     $mform->setDefault('addmedia', 1);
@@ -272,7 +306,7 @@ abstract class baseform  {
 
 
                 //Question media iframe
-                $mform->addElement('text', constants::MEDIAIFRAME, get_string('itemiframe', constants::M_COMPONENT), array('size'=>100));
+                $this->addElement('text', constants::MEDIAIFRAME, get_string('itemiframe', constants::M_COMPONENT), array('size'=>100));
                 $mform->setType(constants::MEDIAIFRAME, PARAM_RAW);
                 if($m35){
                     $mform->hideIf( constants::MEDIAIFRAME,'addiframe','neq', 1);
@@ -282,11 +316,11 @@ abstract class baseform  {
 
 
                 //Question text to speech
-                $mform->addElement('textarea', constants::TTSQUESTION, get_string('itemttsquestion', constants::M_COMPONENT), array('wrap'=>'virtual','style'=>'width: 100%;'));
+                $this->addElement('textarea', constants::TTSQUESTION, get_string('itemttsquestion', constants::M_COMPONENT), array('wrap'=>'virtual','style'=>'width: 100%;'));
                 $mform->setType(constants::TTSQUESTION, PARAM_RAW);
                 $this->add_voiceselect(constants::TTSQUESTIONVOICE,get_string('itemttsquestionvoice',constants::M_COMPONENT));
                 $this->add_voiceoptions(constants::TTSQUESTIONOPTION,get_string('choosevoiceoption',constants::M_COMPONENT));
-                $mform->addElement('advcheckbox',constants::TTSAUTOPLAY,get_string('autoplay',constants::M_COMPONENT),'');
+                $this->addElement('advcheckbox',constants::TTSAUTOPLAY,get_string('autoplay',constants::M_COMPONENT),'');
                 if($m35){
                     $mform->hideIf(constants::TTSQUESTION, 'addttsaudio', 'neq', 1);
                     $mform->hideIf(constants::TTSQUESTIONVOICE, 'addttsaudio', 'neq', 1);
@@ -309,7 +343,7 @@ abstract class baseform  {
                         $edoptions);
                 $this->_form->setDefault(constants::QUESTIONTEXTAREA . '_editor', array('text' => '', 'format' => FORMAT_HTML));
                 $mform->setType(constants::QUESTIONTEXTAREA, PARAM_RAW);
-                $mform->addGroup($groupelements, 'groupelements', get_string('itemtextarea', constants::M_COMPONENT), array(' '), false);
+                $this->addGroup($groupelements, 'groupelements', get_string('itemtextarea', constants::M_COMPONENT), array(' '), false);
                 if($m35){
                     $mform->hideIf('groupelements', 'addtextarea', 'neq', 1);
                    // $mform->hideIf(constants::QUESTIONTEXTAREA. '_editor', 'addtextarea', 'neq', 1);
@@ -327,7 +361,7 @@ abstract class baseform  {
             $ytarray[] =& $mform->createElement('text', constants::YTVIDEOEND, get_string('itemytend', constants::M_COMPONENT),  array('size'=>3,'placeholder'=>"End"));
             $ytarray[] =& $mform->createElement('html','s');
 
-            $mform->addGroup($ytarray, 'ytarray', get_string('ytclipdetails', constants::M_COMPONENT), array(' '), false);
+            $this->addGroup($ytarray, 'ytarray', get_string('ytclipdetails', constants::M_COMPONENT), array(' '), false);
             $mform->setType(constants::YTVIDEOID, PARAM_RAW);
             $mform->setType(constants::YTVIDEOSTART, PARAM_INT);
             $mform->setType(constants::YTVIDEOEND, PARAM_INT);
@@ -342,16 +376,16 @@ abstract class baseform  {
 
             $ttsdialog_instructions_array=array();
             $ttsdialog_instructions_array[] =& $mform->createElement('static', 'ttsdialog_instructions', null,get_string('ttsdialoginstructions', constants::M_COMPONENT));
-            $mform->addGroup($ttsdialog_instructions_array, 'ttsdialog_grp','', array(' '), false);
+            $this->addGroup($ttsdialog_instructions_array, 'ttsdialog_grp','', array(' '), false);
             //Moodle cant hide static text elements with hideif (why?) , so we wrap it in a group
             //$this->add_static_text('ttsdialog_instructions',null,get_string('ttsdialoginstructions', constants::M_COMPONENT));
 
             $this->add_voiceselect(constants::TTSDIALOGVOICEA,get_string('ttsdialogvoicea',constants::M_COMPONENT));
             $this->add_voiceselect(constants::TTSDIALOGVOICEB,get_string('ttsdialogvoiceb',constants::M_COMPONENT));
             $this->add_voiceselect(constants::TTSDIALOGVOICEC,get_string('ttsdialogvoicec',constants::M_COMPONENT));
-            $mform->addElement('textarea', constants::TTSDIALOG, get_string('ttsdialog', constants::M_COMPONENT), array('wrap'=>'virtual','style'=>'width: 100%;','placeholder'=>'A) Hello&#10;B) Goodbye'));
+            $this->addElement('textarea', constants::TTSDIALOG, get_string('ttsdialog', constants::M_COMPONENT), array('wrap'=>'virtual','style'=>'width: 100%;','placeholder'=>'A) Hello&#10;B) Goodbye'));
             $mform->setType(constants::TTSDIALOG, PARAM_RAW);
-            $mform->addElement('advcheckbox',constants::TTSDIALOGVISIBLE,get_string('ttsdialogvisible',constants::M_COMPONENT),get_string('ttsdialogvisible_desc', constants::M_COMPONENT));
+            $this->addElement('advcheckbox',constants::TTSDIALOGVISIBLE,get_string('ttsdialogvisible',constants::M_COMPONENT),get_string('ttsdialogvisible_desc', constants::M_COMPONENT));
             $mform->setDefault(constants::TTSDIALOGVISIBLE, 1);
 
             if($m35){
@@ -374,13 +408,13 @@ abstract class baseform  {
             //Question TTS Passage
             $ttspassage_instructions_array=array();
             $ttspassage_instructions_array[] =& $mform->createElement('static', 'ttspassage_instructions', null,get_string('ttspassageinstructions', constants::M_COMPONENT));
-            $mform->addGroup($ttspassage_instructions_array, 'ttspassage_grp','', array(' '), false);
+            $this->addGroup($ttspassage_instructions_array, 'ttspassage_grp','', array(' '), false);
             //Moodle cant hide static text elements with hideif (why?) , so we wrap it in a group
             //$this->add_static_text('ttspassage_instructions',null,get_string('ttspassageinstructions', constants::M_COMPONENT));
 
             $this->add_voiceselect(constants::TTSPASSAGEVOICE,get_string('ttspassagevoice',constants::M_COMPONENT));
             $this->add_voiceoptions(constants::TTSPASSAGESPEED,get_string('ttspassagespeed',constants::M_COMPONENT));
-            $mform->addElement('textarea', constants::TTSPASSAGE, get_string('ttspassage', constants::M_COMPONENT), array('wrap'=>'virtual','style'=>'width: 100%;','placeholder'=>''));
+            $this->addElement('textarea', constants::TTSPASSAGE, get_string('ttspassage', constants::M_COMPONENT), array('wrap'=>'virtual','style'=>'width: 100%;','placeholder'=>''));
             $mform->setType(constants::TTSPASSAGE, PARAM_RAW);
 
             if($m35){
@@ -405,7 +439,7 @@ abstract class baseform  {
 
     protected final function add_static_text($name, $label = null,$text='') {
 
-        $this->_form->addElement('static',$name, $label, $text);
+        $this->addElement('static',$name, $label, $text);
 
     }
 
@@ -456,7 +490,7 @@ abstract class baseform  {
 
     protected final function add_dropdown($name, $label,$options, $default=false) {
 
-        $this->_form->addElement('select', $name, $label, $options);
+        $this->addElement('select', $name, $label, $options);
         if($default!==false) {
             $this->_form->setDefault($name, $default);
         }
@@ -465,7 +499,7 @@ abstract class baseform  {
 
     protected final function add_media_upload($name, $label, $required = false) {
 		
-		$this->_form->addElement('filemanager',
+		$this->addElement('filemanager',
                            $name,
                            $label,
                            null,
@@ -492,7 +526,7 @@ abstract class baseform  {
             $label = get_string('response', constants::M_COMPONENT);
         }
         //edoptions = array('noclean'=>true)
-        $this->_form->addElement('editor', constants::TEXTANSWER .$count. '_editor', $label, array('rows'=>'4', 'columns'=>'80'), $this->editoroptions);
+        $this->addElement('editor', constants::TEXTANSWER .$count. '_editor', $label, array('rows'=>'4', 'columns'=>'80'), $this->editoroptions);
         $this->_form->setDefault(constants::TEXTANSWER .$count. '_editor', array('text'=>'', 'format'=>FORMAT_MOODLE));
         if ($required) {
             $this->_form->addRule(constants::TEXTANSWER .$count. '_editor', get_string('required'), 'required', null, 'client');
@@ -512,7 +546,7 @@ abstract class baseform  {
             $label = get_string('response', constants::M_COMPONENT);
         }
 
-        $this->_form->addElement('textarea', constants::TEXTANSWER .$count , $label,array('rows'=>'4', 'columns'=>'140', 'style'=>'width: 600px'));
+        $this->addElement('textarea', constants::TEXTANSWER .$count , $label,array('rows'=>'4', 'columns'=>'140', 'style'=>'width: 600px'));
         if ($required) {
             $this->_form->addRule(constants::TEXTANSWER .$count, get_string('required'), 'required', null, 'client');
         }
@@ -530,7 +564,7 @@ abstract class baseform  {
         if ($label === null) {
             $label = get_string('response', constants::M_COMPONENT);
         }
-        $this->_form->addElement('text', constants::TEXTANSWER .$count, $label, array('size'=>'60'));
+        $this->addElement('text', constants::TEXTANSWER .$count, $label, array('size'=>'60'));
         $this->_form->setType(constants::TEXTANSWER .$count, PARAM_TEXT);
         if ($required) {
             $this->_form->addRule(constants::TEXTANSWER .$count, get_string('required'), 'required', null, 'client');
@@ -552,7 +586,7 @@ abstract class baseform  {
         $options['2']=2;
         $options['3']=3;
         $options['4']=4;
-        $this->_form->addElement('select', constants::CORRECTANSWER, $label,$options);
+        $this->addElement('select', constants::CORRECTANSWER, $label,$options);
         $this->_form->setDefault(constants::CORRECTANSWER, 1);
         $this->_form->setType(constants::CORRECTANSWER, PARAM_INT);
     }
@@ -625,7 +659,7 @@ abstract class baseform  {
     protected final function add_confirmchoice($name, $label = null) {
         global $CFG;
         if(empty($label)){$label = get_string('confirmchoice_formlabel', constants::M_COMPONENT);}
-        $this->_form->addElement('selectyesno', $name,$label);
+        $this->addElement('selectyesno', $name,$label);
         $this->_form->setDefault( $name,0);
     }
 
@@ -661,7 +695,7 @@ abstract class baseform  {
      * @return void
      */
     protected final function add_timelimit($name, $label, $default=false) {
-        $this->_form->addElement('duration', $name, $label, ['optional' => true, 'defaultunit' => 1]);
+        $this->addElement('duration', $name, $label, ['optional' => true, 'defaultunit' => 1]);
         if ($default !== false) {
             $this->_form->setDefault($name, $default);
         }
@@ -676,20 +710,11 @@ abstract class baseform  {
      * @return void
      */
     protected final function add_allowretry($name,  $default=0) {
-        $this->_form->addElement('advcheckbox',$name,
+        $this->addElement('advcheckbox',$name,
             get_string('allowretry',constants::M_COMPONENT),
             get_string('allowretry_desc',constants::M_COMPONENT),[],[0,1]);
             if ($default !== 0) {
                 $this->_form->setDefault($name, 1);
             }
     }
-
-    /*
-     *
-
-    $mform->
-
-
-     *
-     */
 }

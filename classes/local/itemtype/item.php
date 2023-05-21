@@ -99,30 +99,33 @@ abstract class item implements templatable, renderable {
      * @param int $currentnumber The current number in the lesson
      * @param \stdClass $itemrecord The db record for the item.
      */
-    public function from_record($itemrecord, $questioninstance=false, $context=false) {
+    public function from_record($itemrecord, $questioninstance, $context) {
         global $DB;
 
         $this->itemrecord = $itemrecord;
+        $this->context = $context;
+
+        //TO SO make sure we dont need this
+
         if(!$questioninstance){
             $this->question = $DB->get_record(constants::M_TABLE,['id'=>$this->itemrecord->questionid],'*', MUST_EXIST);
         }else{
             $this->question =$questioninstance;
         }
-        $this->course = get_course($this->moduleinstance->course);
-        if(!$context) {
-            $cm         = get_coursemodule_from_instance('minispeak', $this->moduleinstance->id, $this->course->id, false, MUST_EXIST);
-            $this->context =  \context_module::instance($cm->id);
-        }else{
-            $this->context = $context;
-        }
+
+
         if(!empty($token)) {
             $this->token = $token;
         }
-        $this->editoroptions = self::fetch_editor_options($this->course,$this->context);
-        $this->filemanageroptions = self::fetch_filemanager_options($this->course);
+        $this->editoroptions = self::fetch_editor_options($this->context);
+        $this->filemanageroptions = self::fetch_filemanager_options();
+
+        // TO DO set these props
+        /*
         $this->forcetitles = $this->moduleinstance->showqtitles;
         $this->region = $this->moduleinstance->region;
         $this->language = $this->moduleinstance->ttslanguage;
+        */
 
     }
 
@@ -674,8 +677,7 @@ abstract class item implements templatable, renderable {
         if(!isset($theitem->id)&&isset($data->itemid)){
             $theitem->id = $data->itemid;
         }
-        $theitem->visible = $data->visible;
-        $theitem->itemorder = $data->itemorder;
+
         $theitem->type = $data->type;
         $theitem->name = $data->name;
         $theitem->phonetic = $data->phonetic;
@@ -691,8 +693,6 @@ abstract class item implements templatable, renderable {
             $theitem->timecreated = time();
             $theitem->createdby = $USER->id;
 
-            //get itemorder
-            $theitem->itemorder = self::fetch_next_item_order($this->moduleinstance->id);
 
             //create a rsquestionkey
             $theitem->rsquestionkey = self::create_itemkey();
@@ -886,34 +886,20 @@ abstract class item implements templatable, renderable {
     }
 
 
-    public static function fetch_editor_options($course, $modulecontext)
+    public static function fetch_editor_options( $modulecontext)
     {
         $maxfiles = 99;
-        $maxbytes = $course->maxbytes;
+        $maxbytes = 0;
         return array('trusttext' => 0,'noclean'=>1, 'subdirs' => true, 'maxfiles' => $maxfiles,
             'maxbytes' => $maxbytes, 'context' => $modulecontext);
     }
 
-    public static function fetch_filemanager_options($course, $maxfiles = 1)
+    public static function fetch_filemanager_options($maxfiles = 1)
     {
-        $maxbytes = $course->maxbytes;
+        $maxbytes = 0;
         return array('subdirs' => true, 'maxfiles' => $maxfiles, 'maxbytes' => $maxbytes, 'accepted_types' => array('audio', 'video','image'));
     }
 
-
-    //fetch the next item order in the list of items
-    protected static function fetch_next_item_order($minispeakid){
-        global $DB;
-
-        $allitems = $DB->get_records(constants::M_QTABLE, ['minispeak' => $minispeakid],'itemorder ASC');
-        if($allitems &&count($allitems) > 0 ){
-            $lastitem = array_pop($allitems);
-            $itemorder = $lastitem->itemorder + 1;
-        }else{
-            $itemorder = 1;
-        }
-        return $itemorder;
-    }
 
     //creates a "unique" item key so that backups and restores won't stuff things
     public static function create_itemkey()

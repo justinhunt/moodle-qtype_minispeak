@@ -236,10 +236,13 @@ abstract class qtype_minispeak_renderer_base extends qtype_with_combined_feedbac
  * Subclass for generating the bits of output specific to Minispeak
  * single questions.
  *
+ * TO DO this is total BS, renderer is just a placeholder to get page to load :not started coding yet
+ *
+ *
  * @copyright 2023 Justin Hunt <justin@poodll.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class qtype_minispeak_single_renderer extends qtype_minispeak_renderer_base {
+class qtype_minispeak_question extends qtype_minispeak_renderer_base {
     protected function get_input_type() {
         return 'radio';
     }
@@ -336,67 +339,4 @@ class qtype_minispeak_single_renderer extends qtype_minispeak_renderer_base {
         return $result;
     }
 
-}
-
-/**
- * Subclass for generating the bits of output specific to Minispeak
- * multi=select questions.
- *
- * @copyright  2023 Justin Hunt <justin@poodll.com>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-class qtype_minispeak_multi_renderer extends qtype_minispeak_renderer_base {
-    protected function after_choices(question_attempt $qa, question_display_options $options) {
-        return '';
-    }
-
-    protected function get_input_type() {
-        return 'checkbox';
-    }
-
-    protected function get_input_name(question_attempt $qa, $value) {
-        return $qa->get_qt_field_name('choice' . $value);
-    }
-
-    protected function get_input_value($value) {
-        return 1;
-    }
-
-    protected function get_input_id(question_attempt $qa, $value) {
-        return $this->get_input_name($qa, $value);
-    }
-
-    protected function is_right(question_answer $ans) {
-        if ($ans->fraction > 0) {
-            return 1;
-        } else {
-            return 0;
-        }
-    }
-
-    protected function prompt() {
-        return get_string('selectmulti', 'qtype_minispeak');
-    }
-
-    public function correct_response(question_attempt $qa) {
-        $question = $qa->get_question();
-
-        $right = array();
-        foreach ($question->answers as $ansid => $ans) {
-            if ($ans->fraction > 0) {
-                $right[] = $question->make_html_inline($question->format_text($ans->answer, $ans->answerformat,
-                        $qa, 'question', 'answer', $ansid));
-            }
-        }
-        return $this->correct_choices($right);
-    }
-
-    protected function num_parts_correct(question_attempt $qa) {
-        if ($qa->get_question()->get_num_selected_choices($qa->get_last_qt_data()) >
-                $qa->get_question()->get_num_correct_choices()) {
-            return get_string('toomanyselected', 'qtype_minispeak');
-        }
-
-        return parent::num_parts_correct($qa);
-    }
 }

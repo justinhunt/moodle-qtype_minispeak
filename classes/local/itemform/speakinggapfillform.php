@@ -16,7 +16,7 @@ class speakinggapfillform extends baseform {
 
     public function custom_definition() {
         $mform = $this->_form;
-        $mform->addElement('advcheckbox',constants::READSENTENCE,
+        $this->addElement('advcheckbox',constants::READSENTENCE,
             get_string('readsentences',constants::M_COMPONENT),
             get_string('readsentences_desc',constants::M_COMPONENT),[],[0,1]);
         $this->add_voiceselect(constants::POLLYVOICE,get_string('choosevoice',constants::M_COMPONENT),constants::READSENTENCE,0);

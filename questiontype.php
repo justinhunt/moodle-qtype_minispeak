@@ -29,6 +29,9 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->libdir . '/questionlib.php');
 
+use \qtype_minispeak\constants;
+use \qtype_minispeak\utils;
+
 
 /**
  * The Minispeak question type.
@@ -64,33 +67,29 @@ class qtype_minispeak extends question_type {
         $options = new stdClass();
         $options->questionid = $question->id;
 
+        $config = get_config('qtype_minispeak');
+        $options->transcriber = $config->transcriber;
+        $options->containerwidth= $config->containerwidth;
+        $options->itemtype=constants::TYPE_PAGE;
+        $options->layout=constants::LAYOUT_AUTO;
+        $options->{constants::TEXTINSTRUCTIONS}='';
+
+
         // Get the default strings and just set the format.
+        /*
         $options->correctfeedback = get_string('correctfeedbackdefault', 'question');
         $options->correctfeedbackformat = FORMAT_HTML;
         $options->partiallycorrectfeedback = get_string('partiallycorrectfeedbackdefault', 'question');;
         $options->partiallycorrectfeedbackformat = FORMAT_HTML;
         $options->incorrectfeedback = get_string('incorrectfeedbackdefault', 'question');
         $options->incorrectfeedbackformat = FORMAT_HTML;
-
-        $config = get_config('qtype_minispeak');
-        $options->single = $config->answerhowmany;
-        if (isset($question->layout)) {
-            $options->layout = $question->layout;
-        }
-        $options->answernumbering = $config->answernumbering;
-        $options->shuffleanswers = $config->shuffleanswers;
-        $options->showstandardinstruction = 0;
-        $options->shownumcorrect = 1;
-
+*/
         return $options;
     }
 
     public function save_defaults_for_new_questions(stdClass $fromform): void {
         parent::save_defaults_for_new_questions($fromform);
-        $this->set_default_value('single', $fromform->single);
-        $this->set_default_value('shuffleanswers', $fromform->shuffleanswers);
-        $this->set_default_value('answernumbering', $fromform->answernumbering);
-        $this->set_default_value('showstandardinstruction', $fromform->showstandardinstruction);
+        //$this->set_default_value('single', $fromform->single);
     }
 
     public function save_question_options($question) {
@@ -98,65 +97,33 @@ class qtype_minispeak extends question_type {
         $context = $question->context;
         $result = new stdClass();
 
-        $oldanswers = $DB->get_records('question_answers',
-                array('question' => $question->id), 'id ASC');
+        //TO DO probably just remove this
+        $questioninstance = false;
 
-        // Following hack to check at least two answers exist.
-        $answercount = 0;
-        foreach ($question->answer as $key => $answer) {
-            if ($answer != '') {
-                $answercount++;
-            }
-        }
-        if ($answercount < 2) { // Check there are at lest 2 answers for Minispeak.
-            $result->error = get_string('notenoughanswers', 'qtype_minispeak', '2');
-            return $result;
-        }
 
-        // Insert all the new answers.
-        $totalfraction = 0;
-        $maxfraction = -1;
-        foreach ($question->answer as $key => $answerdata) {
-            if (trim($answerdata['text']) == '') {
-                continue;
-            }
+        $theitem= utils::fetch_item_from_itemrecord($question,$question,$context);
+        //TO DO fix up $olditem
+        $olditem=false;
 
-            // Update an existing answer if possible.
-            $answer = array_shift($oldanswers);
-            if (!$answer) {
-                $answer = new stdClass();
-                $answer->question = $question->id;
-                $answer->answer = '';
-                $answer->feedback = '';
-                $answer->id = $DB->insert_record('question_answers', $answer);
-            }
+        //remove bad accents and things that mess up transcription (kind of like clear but permanent)
+        $theitem->deaccent();
 
-            // Doing an import.
-            $answer->answer = $this->import_or_save_files($answerdata,
-                    $context, 'question', 'answer', $answer->id);
-            $answer->answerformat = $answerdata['format'];
-            $answer->fraction = $question->fraction[$key];
-            $answer->feedback = $this->import_or_save_files($question->feedback[$key],
-                    $context, 'question', 'answerfeedback', $answer->id);
-            $answer->feedbackformat = $question->feedback[$key]['format'];
+        //create passage hash
+        $theitem->update_create_langmodel($olditem);
 
-            $DB->update_record('question_answers', $answer);
+        //lets update the phonetics
+        $theitem->update_create_phonetic($olditem);
 
-            if ($question->fraction[$key] > 0) {
-                $totalfraction += $question->fraction[$key];
-            }
-            if ($question->fraction[$key] > $maxfraction) {
-                $maxfraction = $question->fraction[$key];
-            }
+        $result = $theitem->update_insert_item();
+        if($result->error==true){
+            print_error($result->message);
+            //what to do?
+
+        }else{
+            $theitem=$result->item;
         }
 
-        // Delete any left over old answer records.
-        $fs = get_file_storage();
-        foreach ($oldanswers as $oldanswer) {
-            $fs->delete_area_files($context->id, 'question', 'answerfeedback', $oldanswer->id);
-            $DB->delete_records('question_answers', array('id' => $oldanswer->id));
-        }
-
+/*
         $options = $DB->get_record('qtype_minispeak_options', array('questionid' => $question->id));
         if (!$options) {
             $options = new stdClass();
@@ -168,7 +135,7 @@ class qtype_minispeak extends question_type {
             $options->id = $DB->insert_record('qtype_minispeak_options', $options);
         }
 
-        $options->single = $question->single;
+
         if (isset($question->layout)) {
             $options->layout = $question->layout;
         }
@@ -177,33 +144,15 @@ class qtype_minispeak extends question_type {
         $options->showstandardinstruction = !empty($question->showstandardinstruction);
         $options = $this->save_combined_feedback_helper($options, $question, $context, true);
         $DB->update_record('qtype_minispeak_options', $options);
+        */
 
         $this->save_hints($question, true);
-
-        // Perform sanity checks on fractional grades.
-        if ($options->single) {
-            if ($maxfraction != 1) {
-                $result->noticeyesno = get_string('fractionsnomax', 'qtype_minispeak',
-                        $maxfraction * 100);
-                return $result;
-            }
-        } else {
-            $totalfraction = round($totalfraction, 2);
-            if ($totalfraction != 1) {
-                $result->noticeyesno = get_string('fractionsaddwrong', 'qtype_minispeak',
-                        $totalfraction * 100);
-                return $result;
-            }
-        }
+        return $result;
     }
 
     protected function make_question_instance($questiondata) {
         question_bank::load_question_definition_classes($this->name());
-        if ($questiondata->options->single) {
-            $class = 'qtype_minispeak_single_question';
-        } else {
-            $class = 'qtype_minispeak_multi_question';
-        }
+        $class = 'qtype_minispeak_question';
         return new $class();
     }
 
@@ -213,17 +162,8 @@ class qtype_minispeak extends question_type {
 
     protected function initialise_question_instance(question_definition $question, $questiondata) {
         parent::initialise_question_instance($question, $questiondata);
-        $question->shuffleanswers = $questiondata->options->shuffleanswers;
-        $question->answernumbering = $questiondata->options->answernumbering;
-        $question->showstandardinstruction = $questiondata->options->showstandardinstruction;
-        if (!empty($questiondata->options->layout)) {
-            $question->layout = $questiondata->options->layout;
-        } else {
-            $question->layout = qtype_minispeak_single_question::LAYOUT_VERTICAL;
-        }
         $this->initialise_combined_feedback($question, $questiondata, true);
 
-        $this->initialise_question_answers($question, $questiondata, false);
     }
 
     public function make_answer($answer) {
@@ -233,23 +173,13 @@ class qtype_minispeak extends question_type {
 
     public function delete_question($questionid, $contextid) {
         global $DB;
-        $DB->delete_records('qtype_minispeak_options', array('questionid' => $questionid));
 
+        qtype_minispeak\local\itemtype\item::delete_item($questionid,$contextid);
         parent::delete_question($questionid, $contextid);
     }
 
     public function get_random_guess_score($questiondata) {
-        if (!$questiondata->options->single) {
-            // Pretty much impossible to compute for _multi questions. Don't try.
-            return null;
-        }
-
-        // Single choice questions - average choice fraction.
-        $totalfraction = 0;
-        foreach ($questiondata->options->answers as $answer) {
-            $totalfraction += $answer->fraction;
-        }
-        return $totalfraction / count($questiondata->options->answers);
+        return null;
     }
 
     public function get_possible_responses($questiondata) {
@@ -277,20 +207,7 @@ class qtype_minispeak extends question_type {
         }
     }
 
-    /**
-     * @return array of the numbering styles supported. For each one, there
-     *      should be a lang string answernumberingxxx in teh qtype_minispeak
-     *      language file, and a case in the switch statement in number_in_style,
-     *      and it should be listed in the definition of this column in install.xml.
-     */
-    public static function get_numbering_styles() {
-        $styles = array();
-        foreach (array('abc', 'ABCD', '123', 'iii', 'IIII', 'none') as $numberingoption) {
-            $styles[$numberingoption] =
-                    get_string('answernumbering' . $numberingoption, 'qtype_minispeak');
-        }
-        return $styles;
-    }
+
 
     public function move_files($questionid, $oldcontextid, $newcontextid) {
         parent::move_files($questionid, $oldcontextid, $newcontextid);

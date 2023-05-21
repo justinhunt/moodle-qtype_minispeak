@@ -28,6 +28,6 @@ defined('MOODLE_INTERNAL') || die();
 $plugin->component = 'qtype_minispeak';
 $plugin->version   = 2022041900;
 
-$plugin->requires  = 2022041200;
+$plugin->requires  = 2016052300;
 
 $plugin->maturity  = MATURITY_STABLE;
