@@ -1,0 +1,16 @@
+{{> qtype_minispeak/questionheader}}
+  {{#audiocontent}}
+      {{> qtype_minispeak/multichoiceaudiocontent}}
+  {{/audiocontent}}
+  {{^audiocontent}}
+      {{> qtype_minispeak/multichoicetextcontent}}
+  {{/audiocontent}}
+    <div class="row mcplayrow">
+        <div class="col-md-6" style="margin-left: auto;margin-right: auto">
+            <div class="minispeak_mc_confirmchoice" style="display: none;" >
+                <span class="minispeak_sentence">{{#str}}confirmchoice, qtype_minispeak{{/str}}</span>
+            </div>
+        </div>
+    </div>
+
+{{> qtype_minispeak/questionfooter}}

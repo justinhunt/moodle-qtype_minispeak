@@ -1,0 +1,22 @@
+{{> qtype_minispeak/questionheader}}
+{{> qtype_minispeak/progress_dots}}
+
+  <div class="minispeak_speechcards-container {{rtl}}">
+
+    <div class="minispeak_speechcards_target_phrase">
+
+
+    </div>
+
+    <div class="minispeak_star_rating">· · ·</div>
+    {{> qtype_minispeak/ttrecorder}}
+
+    <div style="text-align:center;">
+      <button style="border: 2px solid darkgray;border-radius: 5px;" class="center-block btn btn-secondary minispeak-speechcards_button minispeak-speechcards_nextbutton" type="button" >
+        <i class="fa fa-times"></i> {{#str}}skip, mod_wordcards{{/str}}
+      </button>
+    </div>
+
+  </div>
+
+{{> qtype_minispeak/questionfooter}}

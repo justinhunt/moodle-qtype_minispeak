@@ -101,16 +101,18 @@ abstract class item implements templatable, renderable {
      */
     public function from_record($itemrecord, $questioninstance, $context) {
         global $DB;
-
+        $config=get_config(constants::M_COMPONENT);
         $this->itemrecord = $itemrecord;
         $this->context = $context;
+        $this->region= $config->awsregion;
+        $this->language= $itemrecord->ttslanguage;
 
-        //TO SO make sure we dont need this
-
+        //we need to set the module instance which is also the itemrecord, because in minilesson some settings are in the minilesson module instance
+        //so we can copy paste as much code as possible we do this, though its a bit yuck
         if(!$questioninstance){
-            $this->question = $DB->get_record(constants::M_TABLE,['id'=>$this->itemrecord->questionid],'*', MUST_EXIST);
+            $this->moduleinstance = $DB->get_record(constants::M_TABLE,['id'=>$this->itemrecord->questionid],'*', MUST_EXIST);
         }else{
-            $this->question =$questioninstance;
+            $this->moduleinstance=$questioninstance;
         }
 
 
@@ -673,7 +675,7 @@ abstract class item implements templatable, renderable {
         $data = $this->itemrecord;
 
         $theitem = new \stdClass;
-        $theitem->questionid = $this->question->id;
+        $theitem->questionid = $this->moduleinstance->id;
         if(!isset($theitem->id)&&isset($data->itemid)){
             $theitem->id = $data->itemid;
         }
@@ -859,7 +861,7 @@ abstract class item implements templatable, renderable {
         }
     }//end of edit_insert_question
 
-    public static function delete_item($itemid, $context)
+    public static function delete_item($itemid, $contextid)
     {
         global $DB;
         $ret = false;
@@ -879,7 +881,7 @@ abstract class item implements templatable, renderable {
             constants::MEDIAQUESTION);
 
         foreach ($fileareas as $filearea) {
-            $fs->delete_area_files($context->id, constants::M_COMPONENT, $filearea, $itemid);
+            $fs->delete_area_files($contextid, constants::M_COMPONENT, $filearea, $itemid);
         }
         $ret = true;
         return $ret;

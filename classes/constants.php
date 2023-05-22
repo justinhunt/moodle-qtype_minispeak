@@ -301,4 +301,14 @@ const M_STANDARD_FONTS = ["Arial", "Arial Black", "Verdana", "Tahoma", "Trebuche
 
 const M_GOOGLE_FONTS = ["Andika"];
 
+const M_EXTRA_FIELDS = ['type','iteminstructions','itemtext', 'itemtextformat','itemtts','itemttsvoice','itemttsoption',
+    'itemytid','itemytstart','itemytend',
+    'itemttsautoplay', 'itemaudiofname','itemtextarea','itemttsdialog', 'itemttsdialogopts','itemttspassage','itemttspassageopts', 'customtext1', 'customtext1format','customtext2', 'customtext2format','customtext3',
+    'customtext3format','customtext4', 'customtext4format','customtext5', 'customtext5format',
+    'customdata1','customdata2', 'customdata3','customdata4', 'customdata5',
+    'customint1','customint2', 'customint3','customint4', 'customint5','layout','correctanswer','timelimit',
+    'timemodified','rsquestionkey','passagehash','alternatives','phonetic','createdby','modifiedby'];
+
+const M_FILE_AREAS = [];
+
 }

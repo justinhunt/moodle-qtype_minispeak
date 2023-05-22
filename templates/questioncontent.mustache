@@ -1,0 +1,17 @@
+<div class="minispeak_questionheader_contents">
+    {{^magazine}}{{#itemimage}}<div class="qtype_minispeak_itemimage_cont"><img src="{{{itemimage}}}" class="qtype_minispeak_itemimage"/></div>{{/itemimage}}{{/magazine}}
+    {{#itemtextarea}}<div class="qtype_minispeak_itemtextarea_cont">
+            <div class="qtype_minispeak_itemtextarea {{rtl}}">
+                {{#magazine}}{{#itemimage}}<div class="qtype_minispeak_itemimage_cont qtype_minispeak_magazine"><img src="{{{itemimage}}}" class="qtype_minispeak_itemimage"/></div>{{/itemimage}}{{/magazine}}
+                {{{itemtextarea}}}
+            </div>
+        </div>
+    {{/itemtextarea}}
+    {{#itemaudio}}<div class="qtype_minispeak_itemaudio_cont"><audio controls src="{{{itemaudio}}}" class="qtype_minispeak_itemaudio"></audio></div>{{/itemaudio}}
+    {{#itemvideo}}<div class="qtype_minispeak_itemvideo_cont"><video controls src="{{{itemvideo}}}" class="qtype_minispeak_itemvideo"></video></div>{{/itemvideo}}
+    {{#itemiframe}}<div class="qtype_minispeak_itemiframe_cont"><div class="qtype_minispeak_iframe_responsive">{{{itemiframe}}}</div></div>{{/itemiframe}}
+    <!-- moved TTS Audio from questioncontents -> question header -->
+    {{#itemytvideoid}}<div class="qtype_minispeak_itemytclip_cont"><div class="qtype_minispeak_iframe_responsive">{{> qtype_minispeak/youtubeclip}}</div></div>{{/itemytvideoid}}
+    {{#itemttsdialog}}<div class="qtype_minispeak_itemttsdialog_cont">{{> qtype_minispeak/ttsdialog}}</div>{{/itemttsdialog}}
+    {{#itemttspassage}}<div class="qtype_minispeak_itemttspassage_cont">{{> qtype_minispeak/ttspassage}}</div>{{/itemttspassage}}
+</div>

@@ -70,20 +70,12 @@ class qtype_minispeak extends question_type {
         $config = get_config('qtype_minispeak');
         $options->transcriber = $config->transcriber;
         $options->containerwidth= $config->containerwidth;
+        $options->ttslanguage= $config->ttslanguage;
         $options->itemtype=constants::TYPE_PAGE;
         $options->layout=constants::LAYOUT_AUTO;
         $options->{constants::TEXTINSTRUCTIONS}='';
 
 
-        // Get the default strings and just set the format.
-        /*
-        $options->correctfeedback = get_string('correctfeedbackdefault', 'question');
-        $options->correctfeedbackformat = FORMAT_HTML;
-        $options->partiallycorrectfeedback = get_string('partiallycorrectfeedbackdefault', 'question');;
-        $options->partiallycorrectfeedbackformat = FORMAT_HTML;
-        $options->incorrectfeedback = get_string('incorrectfeedbackdefault', 'question');
-        $options->incorrectfeedbackformat = FORMAT_HTML;
-*/
         return $options;
     }
 
@@ -95,12 +87,8 @@ class qtype_minispeak extends question_type {
     public function save_question_options($question) {
         global $DB;
         $context = $question->context;
-        $result = new stdClass();
 
-        //TO DO probably just remove this
-        $questioninstance = false;
-
-
+        //we pass in $question as itemrecord, and moduleinstance, so the signature is consistent with minilesson
         $theitem= utils::fetch_item_from_itemrecord($question,$question,$context);
         //TO DO fix up $olditem
         $olditem=false;
@@ -119,32 +107,8 @@ class qtype_minispeak extends question_type {
             print_error($result->message);
             //what to do?
 
-        }else{
-            $theitem=$result->item;
         }
 
-/*
-        $options = $DB->get_record('qtype_minispeak_options', array('questionid' => $question->id));
-        if (!$options) {
-            $options = new stdClass();
-            $options->questionid = $question->id;
-            $options->correctfeedback = '';
-            $options->partiallycorrectfeedback = '';
-            $options->incorrectfeedback = '';
-            $options->showstandardinstruction = 0;
-            $options->id = $DB->insert_record('qtype_minispeak_options', $options);
-        }
-
-
-        if (isset($question->layout)) {
-            $options->layout = $question->layout;
-        }
-        $options->answernumbering = $question->answernumbering;
-        $options->shuffleanswers = $question->shuffleanswers;
-        $options->showstandardinstruction = !empty($question->showstandardinstruction);
-        $options = $this->save_combined_feedback_helper($options, $question, $context, true);
-        $DB->update_record('qtype_minispeak_options', $options);
-        */
 
         $this->save_hints($question, true);
         return $result;
@@ -153,7 +117,9 @@ class qtype_minispeak extends question_type {
     protected function make_question_instance($questiondata) {
         question_bank::load_question_definition_classes($this->name());
         $class = 'qtype_minispeak_question';
-        return new $class();
+        $q = new $class();
+        $q->ttslanguage=get_config(constants::M_COMPONENT,'ttslanguage');
+        return $q;
     }
 
     protected function make_hint($hint) {
@@ -162,8 +128,25 @@ class qtype_minispeak extends question_type {
 
     protected function initialise_question_instance(question_definition $question, $questiondata) {
         parent::initialise_question_instance($question, $questiondata);
-        $this->initialise_combined_feedback($question, $questiondata, true);
+        foreach (constants::M_EXTRA_FIELDS as $field) {
+            $question->{$field} = $questiondata->options->{$field};
+        }
+    }
 
+    /**
+     * If your question type has a table that extends the question table, and
+     * you want the base class to automatically save, backup and restore the extra fields,
+     * override this method to return an array wherer the first element is the table name,
+     * and the subsequent entries are the column names (apart from id and questionid).
+     *
+     * @return mixed array as above, or null to tell the base class to do nothing.
+     */
+    public function extra_question_fields() {
+        $tableinfo = array(constants::M_QTABLE);
+        foreach (constants::M_EXTRA_FIELDS as $field) {
+            $tableinfo[] = $field;
+        }
+        return $tableinfo;
     }
 
     public function make_answer($answer) {
@@ -183,43 +166,31 @@ class qtype_minispeak extends question_type {
     }
 
     public function get_possible_responses($questiondata) {
-        if ($questiondata->options->single) {
-            $responses = array();
-
-            foreach ($questiondata->options->answers as $aid => $answer) {
-                $responses[$aid] = new question_possible_response(
-                        question_utils::to_plain_text($answer->answer, $answer->answerformat),
-                        $answer->fraction);
-            }
-
-            $responses[null] = question_possible_response::no_response();
-            return array($questiondata->id => $responses);
-        } else {
-            $parts = array();
-
-            foreach ($questiondata->options->answers as $aid => $answer) {
-                $parts[$aid] = array($aid => new question_possible_response(
-                        question_utils::to_plain_text($answer->answer, $answer->answerformat),
-                        $answer->fraction));
-            }
-
-            return $parts;
-        }
+        return[];
     }
 
 
 
     public function move_files($questionid, $oldcontextid, $newcontextid) {
         parent::move_files($questionid, $oldcontextid, $newcontextid);
-        $this->move_files_in_answers($questionid, $oldcontextid, $newcontextid, true);
-        $this->move_files_in_combined_feedback($questionid, $oldcontextid, $newcontextid);
-        $this->move_files_in_hints($questionid, $oldcontextid, $newcontextid);
+        $fs = get_file_storage();
+        $itemid =false; //this will move all files, I think that is what we want
+        foreach(constants::M_FILE_AREAS as $filearea) {
+            $fs->move_area_files_to_new_context($oldcontextid,
+                $newcontextid, constants::M_COMPONENT, $filearea, $itemid);
+
+        }
+
     }
 
     protected function delete_files($questionid, $contextid) {
         parent::delete_files($questionid, $contextid);
-        $this->delete_files_in_answers($questionid, $contextid, true);
-        $this->delete_files_in_combined_feedback($questionid, $contextid);
-        $this->delete_files_in_hints($questionid, $contextid);
+
+        $fs = get_file_storage();
+        foreach(constants::M_FILE_AREAS as $filearea){
+            $fs->delete_area_files($contextid, constants::M_COMPONENT,
+                $filearea, $questionid);
+        }
+
     }
 }

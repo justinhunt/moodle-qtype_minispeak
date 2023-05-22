@@ -129,9 +129,9 @@ class qtype_minispeak_edit_form extends question_edit_form {
 */
     protected function data_preprocessing($question) {
         $question = parent::data_preprocessing($question);
-        $question = $this->data_preprocessing_answers($question, true);
-        $question = $this->data_preprocessing_combined_feedback($question, true);
-        $question = $this->data_preprocessing_hints($question, true, true);
+    //    $question = $this->data_preprocessing_answers($question, true);
+     //   $question = $this->data_preprocessing_combined_feedback($question, true);
+   //     $question = $this->data_preprocessing_hints($question, true, true);
 /*
         if (!empty($question->options)) {
             $question->single = $question->options->single;

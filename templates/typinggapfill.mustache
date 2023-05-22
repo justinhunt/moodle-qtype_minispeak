@@ -1,0 +1,37 @@
+{{> qtype_minispeak/questionheader}}
+<div class="minispeak_tgapfill_player_box gapfill-container">
+    <div class="tgapfill_title text-center">{{#str}}typinggapfill, qtype_minispeak{{/str}}</div>
+
+    <div class="tgapfill_mainmenu">
+        <div class="tgapfill_loaded" style="display:none;">
+            <button disabled class='btn btn-block btn-primary tgapfill_start_btn' type="button">
+                <i class='fa fa-play'></i> {{#str}}start, qtype_minispeak{{/str}}
+            </button>
+        </div>
+        <div class="tgapfill_not_loaded">
+            <p>{{#str}}loading, qtype_minispeak{{/str}}</p>
+        </div>
+    </div>
+
+    <div class="progress-container d-flex" style="display:none;">
+        <div id="progresstimer" class="flex-grow-1"></div>
+        <div>
+            <i style="display:none;" class="fa fa-clock-o" aria-hidden="true"></i>
+        </div>
+    </div>
+
+    <div style="display:none;" class="question"></div>
+
+    <div style="display:none;" class="tgapfill_controls">
+
+        <button class="btn btn-success tgapfill_ctrl-btn tgapfill_check_btn" type="button">
+            <i class="fa fa-check"></i> {{#str}}check, qtype_minispeak{{/str}}
+        </button>
+
+        <button class="btn btn-danger tgapfill_ctrl-btn tgapfill_skip_btn" type="button">
+            {{#str}}skip, qtype_minispeak{{/str}} <i class="fa fa-arrow-right"></i>
+        </button>
+
+    </div>
+</div>
+{{> qtype_minispeak/questionfooter}}

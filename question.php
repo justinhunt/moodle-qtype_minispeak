@@ -40,10 +40,7 @@ abstract class qtype_minispeak_base extends question_graded_automatically {
     const LAYOUT_VERTICAL = 1;
     const LAYOUT_HORIZONTAL = 2;
 
-    public $answers;
 
-    public $shuffleanswers;
-    public $answernumbering;
     /**
      * @var int standard instruction to be displayed if enabled.
      */
@@ -144,37 +141,10 @@ abstract class qtype_minispeak_base extends question_graded_automatically {
     public abstract function is_choice_selected($response, $value);
 
     public function check_file_access($qa, $options, $component, $filearea, $args, $forcedownload) {
-        if ($component == 'question' && in_array($filearea,
-                array('correctfeedback', 'partiallycorrectfeedback', 'incorrectfeedback'))) {
-            return $this->check_combined_feedback_file_access($qa, $options, $filearea, $args);
 
-        } else if ($component == 'question' && $filearea == 'answer') {
-            $answerid = reset($args); // Itemid is answer id.
-            return  in_array($answerid, $this->order);
-
-        } else if ($component == 'question' && $filearea == 'answerfeedback') {
-            $answerid = reset($args); // Itemid is answer id.
-            $response = $this->get_response($qa);
-            $isselected = false;
-            foreach ($this->order as $value => $ansid) {
-                if ($ansid == $answerid) {
-                    $isselected = $this->is_choice_selected($response, $value);
-                    break;
-                }
-            }
-            // Param $options->suppresschoicefeedback is a hack specific to the
-            // oumultiresponse question type. It would be good to refactor to
-            // avoid refering to it here.
-            return $options->feedback && empty($options->suppresschoicefeedback) &&
-                    $isselected;
-
-        } else if ($component == 'question' && $filearea == 'hint') {
-            return $this->check_hint_file_access($qa, $options, $args);
-
-        } else {
             return parent::check_file_access($qa, $options, $component, $filearea,
                     $args, $forcedownload);
-        }
+
     }
 
     /**
@@ -209,7 +179,7 @@ abstract class qtype_minispeak_base extends question_graded_automatically {
  */
 class qtype_minispeak_question extends qtype_minispeak_base {
     public function get_renderer(moodle_page $page) {
-        return $page->get_renderer('qtype_minispeak', 'question');
+        return $page->get_renderer('qtype_minispeak');
     }
 
     public function get_min_fraction() {

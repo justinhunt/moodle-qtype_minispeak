@@ -177,6 +177,7 @@ abstract class baseform  {
 
         $m35 = $CFG->version >= 2018051700;
         $mform = $this->_form;
+        $config  = get_config(constants::M_COMPONENT);
 
         // we do not need this heading, though in MiniLesson we do
        // $this->addElement('header', 'typeheading', get_string('createaitem', constants::M_COMPONENT, get_string($this->type, constants::M_COMPONENT)));
@@ -281,6 +282,11 @@ abstract class baseform  {
                             get_string('buttonquiz_instructions1', constants::M_COMPONENT));
                         break;
                 }
+
+                //tts options
+                $langoptions = utils::get_lang_options();
+                $this->addElement('select', 'ttslanguage', get_string('ttslanguage', constants::M_COMPONENT), $langoptions);
+                $mform->setDefault('ttslanguage',$config->ttslanguage);
 
                 $togglearray=array();
                 $togglearray[] =& $mform->createElement('advcheckbox','addmedia',get_string('addmedia',constants::M_COMPONENT),'');

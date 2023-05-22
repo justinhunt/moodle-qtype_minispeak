@@ -61,7 +61,8 @@ class utils{
  *
  */
     public static function needs_lang_model($moduleinstance, $passage) {
-        switch($moduleinstance->region){
+        $config = get_config(constants::M_COMPONENT);
+        switch($config->awsregion){
 
             case 'capetown':
             case 'bahrain':
@@ -1325,6 +1326,124 @@ class utils{
             case constants::TYPE_TGAPFILL: return '\\'. constants::M_COMPONENT . '\local\itemform\typinggapfillform';
             default:
         }
+    }
+
+    public static function fetch_data_for_js($item,$moduleinstance,$context){
+        global $CFG,  $OUTPUT;
+
+
+        //first confirm we are authorised before we try to get the token
+        $config = get_config(constants::M_COMPONENT);
+        if(empty($config->apiuser) || empty($config->apisecret)){
+            $errormessage = get_string('nocredentials',constants::M_COMPONENT,
+                $CFG->wwwroot . constants::M_PLUGINSETTINGS);
+            //return error?
+            $token=false;
+        }else {
+            //fetch token
+            $token = utils::fetch_token($config->apiuser,$config->apisecret);
+
+            //check token authenticated and no errors in it
+            $errormessage = utils::fetch_token_error($token);
+            if(!empty($errormessage)){
+                //return error?
+                //return $this->show_problembox($errormessage);
+            }
+        }
+
+
+        //prepare data
+        $theitem=utils::fetch_item_from_itemrecord($item,$moduleinstance,$context);
+        $theitem->set_token($token);
+
+        //add our item to test
+        $renderer=$OUTPUT;
+        $itemdata=$theitem->export_for_template($renderer);
+        return $itemdata;
+    }
+
+
+  public static function fetch_item_amd($itemdata,$question){
+        global $CFG, $USER, $PAGE;
+        //any html we want to return to be sent to the page
+        $ret_html = '';
+
+        //here we set up any info we need to pass into javascript
+
+        $recopts =Array();
+        //recorder html ids
+        $recopts['recorderid'] = constants::M_RECORDERID;
+        $recopts['recordingcontainer'] = constants::M_RECORDING_CONTAINER;
+        $recopts['recordercontainer'] = constants::M_RECORDER_CONTAINER;
+
+        //activity html ids
+        $recopts['passagecontainer'] = constants::M_PASSAGE_CONTAINER;
+        $recopts['instructionscontainer'] = constants::M_INSTRUCTIONS_CONTAINER;
+        $recopts['recordbuttoncontainer'] =constants::M_RECORD_BUTTON_CONTAINER;
+        $recopts['startbuttoncontainer'] =constants::M_START_BUTTON_CONTAINER;
+        $recopts['hider']=constants::M_HIDER;
+        $recopts['progresscontainer'] = constants::M_PROGRESS_CONTAINER;
+        $recopts['feedbackcontainer'] = constants::M_FEEDBACK_CONTAINER;
+        $recopts['wheretonextcontainer'] = constants::M_WHERETONEXT_CONTAINER;
+        $recopts['quizcontainer'] = constants::M_QUIZ_CONTAINER;
+        $recopts['errorcontainer'] = constants::M_ERROR_CONTAINER;
+
+        //first confirm we are authorised before we try to get the token
+        $config = get_config(constants::M_COMPONENT);
+        if(empty($config->apiuser) || empty($config->apisecret)){
+            $errormessage = get_string('nocredentials',constants::M_COMPONENT,
+                $CFG->wwwroot . constants::M_PLUGINSETTINGS);
+            return self::show_problembox($errormessage);
+        }else {
+            //fetch token
+            $token = utils::fetch_token($config->apiuser,$config->apisecret);
+
+            //check token authenticated and no errors in it
+            $errormessage = utils::fetch_token_error($token);
+            if(!empty($errormessage)){
+                return self::show_problembox($errormessage);
+            }
+        }
+        $recopts['token']=$token;
+        $recopts['owner']=hash('md5',$USER->username);
+        $recopts['region']=$config->awsregion;
+        $recopts['ttslanguage']=$question->ttslanguage;
+        //TO DO  - set the item transcriber in the itemdata
+        $recopts['stt_guided']=true;//$itemdata->transcriber==constants::TRANSCRIBER_POODLL;
+
+
+        $recopts['useanimatecss']=$config->animations==constants::M_ANIM_FANCY;
+        $recopts['quizdata'] = [$itemdata];
+
+        //this inits the M.mod_minilesson thingy, after the page has loaded.
+        //we put the opts in html on the page because moodle/AMD doesn't like lots of opts in js
+        //convert opts to json
+        $jsonstring = json_encode($recopts);
+        $widgetid = constants::M_RECORDERID . '_opts_9999';
+        $opts_html = \html_writer::tag('input', '', array('id' => 'amdopts_' . $widgetid, 'type' => 'hidden', 'value' => $jsonstring));
+
+        //the recorder div
+        $ret_html = $ret_html . $opts_html;
+        //TO DO we fudge a cmid and its not really needed
+        $opts=array('cmid'=>$question->id,'widgetid'=>$widgetid);
+        $PAGE->requires->js_call_amd("qtype_minispeak/activitycontroller", 'init', array($opts));
+
+
+        //these need to be returned and echo'ed to the page
+        return $ret_html;
+    }
+
+    /**
+     * Return HTML to display message about problem
+     */
+    public static function show_problembox($msg) {
+        global $OUTPUT;
+
+        $output = '';
+        $output .= $OUTPUT->box_start(constants::M_COMPONENT . '_problembox');
+        $output .= $OUTPUT->notification($msg, 'warning');
+        $output .= $OUTPUT->box_end();
+        return $output;
     }
 
 }

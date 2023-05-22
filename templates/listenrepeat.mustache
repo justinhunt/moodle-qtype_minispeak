@@ -1,0 +1,39 @@
+{{> qtype_minispeak/questionheader}}
+  <div class="minispeak_landr_player_box">
+    <div style="display:none;" class="landr_results">{{#str}}dc_results, qtype_minispeak{{/str}}</div>
+
+    <div class="landr_title text-center" style="display: none">{{#str}}listenandrepeat, qtype_minispeak{{/str}}</div>
+
+    <div class="landr_mainmenu">
+      <div class="landr_loaded" style="display:none;">
+          <button disabled class='btn btn-block btn-primary landr_start_btn' type="button">
+              <i class='fa fa-play'></i> {{#str}}start, qtype_minispeak{{/str}}
+          </button>
+      </div>
+      <div class="landr_not_loaded">
+        <p>{{#str}}loading, qtype_minispeak{{/str}}</p>
+      </div>
+    </div>
+
+    <div style="display:none;" class="landr_game {{rtl}}"></div>
+
+    <div style="display:none;" class="landr_controls">
+
+      <button class="btn btn-secondary landr_ctrl-btn landr_listen_btn" type="button">
+        <i class="fa fa-volume-up"></i> {{#str}}listen, qtype_minispeak{{/str}}
+      </button>
+
+      <button class="btn btn-danger landr_ctrl-btn landr_skip_btn" type="button">
+        {{#str}}skip, qtype_minispeak{{/str}} <i class="fa fa-arrow-right"></i>
+      </button>
+
+    </div>
+
+    <div class="landr_speakbtncontainer">
+        {{> qtype_minispeak/ttrecorder}}
+
+    </div>
+
+  </div>
+
+{{> qtype_minispeak/questionfooter}}

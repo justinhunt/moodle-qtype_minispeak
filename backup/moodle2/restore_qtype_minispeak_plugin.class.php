@@ -154,7 +154,7 @@ class restore_qtype_minispeak_plugin extends restore_qtype_plugin {
 
         $contents = array();
 
-        $fields = array('correctfeedback', 'partiallycorrectfeedback', 'incorrectfeedback');
+        $fields = array();
         $contents[] = new restore_decode_content('qtype_minispeak_options',
                 $fields, 'qtype_minispeak_options');
 

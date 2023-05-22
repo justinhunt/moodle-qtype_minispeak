@@ -1,0 +1,38 @@
+{{> qtype_minispeak/questionheader}}
+  <div class="minispeak_dictate_player_box">
+    <div style="display:none;" class="dictate_results">{{#str}}dc_results, qtype_minispeak{{/str}}</div>
+
+    <div class="dictate_title text-center" style="display: none">{{#str}}listenandtype, qtype_minispeak{{/str}}</div>
+
+    <div class="dictate_mainmenu">
+      <div class="dictate_loaded" style="display:none;">
+        <button disabled class='btn btn-block btn-primary dictate_start_btn' type="button">
+              <i class='fa fa-play'></i> {{#str}}start, qtype_minispeak{{/str}}
+        </button>
+
+      </div>
+      <div class="dictate_not_loaded">
+        <p>{{#str}}loading, qtype_minispeak{{/str}}</p>
+      </div>
+    </div>
+
+    <div style="display:none;" class="dictate_game {{rtl}}"></div>
+
+    <div style="display:none;" class="dictate_controls">
+
+      <button class="btn btn-secondary dictate_ctrl-btn dictate_listen_btn" type="button">
+            <i class="fa fa-volume-up"></i> {{#str}}listen, qtype_minispeak{{/str}}
+        </button>
+
+      <button class="btn btn-success dictate_ctrl-btn dictate_check_btn" type="button">
+            <i class="fa fa-check"></i> {{#str}}check, qtype_minispeak{{/str}}
+        </button>
+
+
+      <button class="btn btn-danger dictate_ctrl-btn dictate_skip_btn" type="button">
+            {{#str}}skip, qtype_minispeak{{/str}} <i class="fa fa-arrow-right"></i>
+        </button>
+
+    </div>
+  </div>
+{{> qtype_minispeak/questionfooter}}

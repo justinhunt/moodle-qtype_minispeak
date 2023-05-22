@@ -1,0 +1,20 @@
+<div id="{{uniqueid}}_container" class="minispeak_questioncontainer" >
+  {{> qtype_minispeak/quiz_progress}}
+  <audio id="{{uniqueid}}_player"></audio>
+  <!-- @@CLOUDPOODLLTOKEN@@ -->
+  <!-- title + instructions -->
+    {{#title}}<div class="minispeak_questionheader"><b>{{#str}}d_question, qtype_minispeak{{/str}} {{number}}: {{{title}}}</b></div>{{/title}}
+    {{#iteminstructions}}<div class="qtype_minispeak_iteminstructions">{{iteminstructions}}</div>{{/iteminstructions}}
+    {{#itemtext}}<div class="qtype_minispeak_itemtext {{rtl}}">{{{itemtext}}}</div>{{/itemtext}}
+    {{#itemttsaudio}}<div class="qtype_minispeak_itemttsaudio_cont">{{> qtype_minispeak/ttsaudio}}</div>{{/itemttsaudio}}
+    {{#horizontal}}
+    <div class="row" style="margin-top: 20px;">
+    <div class="col-sm-6">
+    {{/horizontal}}
+    <!-- Content -->
+    {{> qtype_minispeak/questioncontent}}
+
+    {{#horizontal}}
+    </div>
+    <div class="col-sm-6">
+    {{/horizontal}}

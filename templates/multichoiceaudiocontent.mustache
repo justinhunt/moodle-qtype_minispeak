@@ -1,0 +1,21 @@
+
+  {{#sentences}}
+      <div class="row mcplayrow">
+          <div class="col-md-1 mcaudioplayer_{{indexplusone}}">
+              <div class="mc_playbutton_container">
+              <button class="minispeak_mc_audioplayer mcplaytrigger btn btn-secondary" type="button" data-index="{{indexplusone}}" id="{{uniqueid}}_audioplayer{{indexplusone}}"><i class="fa fa-play minispeak_mc_playstate"></i></button>
+              </div>
+          </div>
+          <div class="col-md-11 mcaudiotranscript_{{index}}">
+              <div class="minispeak_mc_response" data-index="{{indexplusone}}" id="{{uniqueid}}_option{{indexplusone}}" name="{{uniqueid}}_options" >
+                  <span class="minispeak_sentence">{{prompt}}</span>
+                  <span class="minispeak_mc_resultbox">
+                  <i class="fa fa-square-o fa-lg minispeak_mc_unanswered"></i>
+                  <i class="fa fa-check fa-lg minispeak_mc_right" style="display: none;"></i>
+                  <i class="fa fa-times fa-lg minispeak_mc_wrong" style="display: none;"></i>
+                  </span>
+              </div>
+          </div>
+      </div>
+  {{/sentences}}
+
