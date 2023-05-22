@@ -1286,23 +1286,23 @@ class utils{
 
    }
 
-   public static function fetch_item_from_itemrecord($itemrecord,$moduleinstance, $context){
+   public static function fetch_item_from_question($question, $context){
        //Set up the item type specific parts of the form data
-       switch($itemrecord->type){
-           case constants::TYPE_MULTICHOICE: return new local\itemtype\item_multichoice($itemrecord,$moduleinstance,$context);
-           case constants::TYPE_MULTIAUDIO: return new local\itemtype\item_multiaudio($itemrecord,$moduleinstance,$context);
-           case constants::TYPE_DICTATIONCHAT: return new local\itemtype\item_dictationchat($itemrecord,$moduleinstance,$context);
-           case constants::TYPE_DICTATION: return new local\itemtype\item_dictation($itemrecord,$moduleinstance,$context);
-           case constants::TYPE_SPEECHCARDS: return new local\itemtype\item_speechcards($itemrecord,$moduleinstance,$context);
-           case constants::TYPE_LISTENREPEAT: return new local\itemtype\item_listenrepeat($itemrecord,$moduleinstance,$context);
-           case constants::TYPE_PAGE: return new local\itemtype\item_page($itemrecord,$moduleinstance,$context);
-           case constants::TYPE_SMARTFRAME: return new local\itemtype\item_smartframe($itemrecord,$moduleinstance,$context);
-           case constants::TYPE_SHORTANSWER: return new local\itemtype\item_shortanswer($itemrecord,$moduleinstance,$context);
-           case constants::TYPE_COMPQUIZ: return new local\itemtype\item_compquiz($itemrecord,$moduleinstance,$context);
-           case constants::TYPE_BUTTONQUIZ: return new local\itemtype\item_buttonquiz($itemrecord,$moduleinstance,$context);
-           case constants::TYPE_SGAPFILL: return new local\itemtype\item_speakinggapfill($itemrecord,$moduleinstance,$context);
-           case constants::TYPE_LGAPFILL: return new local\itemtype\item_listeninggapfill($itemrecord,$moduleinstance,$context);
-           case constants::TYPE_TGAPFILL: return new local\itemtype\item_typinggapfill($itemrecord,$moduleinstance,$context);
+       switch($question->type){
+           case constants::TYPE_MULTICHOICE: return new local\itemtype\item_multichoice($question,$context);
+           case constants::TYPE_MULTIAUDIO: return new local\itemtype\item_multiaudio($question,$context);
+           case constants::TYPE_DICTATIONCHAT: return new local\itemtype\item_dictationchat($question,$context);
+           case constants::TYPE_DICTATION: return new local\itemtype\item_dictation($question,$context);
+           case constants::TYPE_SPEECHCARDS: return new local\itemtype\item_speechcards($question,$context);
+           case constants::TYPE_LISTENREPEAT: return new local\itemtype\item_listenrepeat($question,$context);
+           case constants::TYPE_PAGE: return new local\itemtype\item_page($question,$context);
+           case constants::TYPE_SMARTFRAME: return new local\itemtype\item_smartframe($question,$context);
+           case constants::TYPE_SHORTANSWER: return new local\itemtype\item_shortanswer($question,$context);
+           case constants::TYPE_COMPQUIZ: return new local\itemtype\item_compquiz($question,$context);
+           case constants::TYPE_BUTTONQUIZ: return new local\itemtype\item_buttonquiz($question,$context);
+           case constants::TYPE_SGAPFILL: return new local\itemtype\item_speakinggapfill($question,$context);
+           case constants::TYPE_LGAPFILL: return new local\itemtype\item_listeninggapfill($question,$context);
+           case constants::TYPE_TGAPFILL: return new local\itemtype\item_typinggapfill($question,$context);
            default:
        }
    }
@@ -1353,7 +1353,7 @@ class utils{
 
 
         //prepare data
-        $theitem=utils::fetch_item_from_itemrecord($item,$moduleinstance,$context);
+        $theitem=utils::fetch_item_from_question($item,$moduleinstance,$context);
         $theitem->set_token($token);
 
         //add our item to test

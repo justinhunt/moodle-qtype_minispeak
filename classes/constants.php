@@ -144,7 +144,7 @@ const LAYOUT_AUTO = 0;
 const LAYOUT_HORIZONTAL = 1;
 const LAYOUT_VERTICAL = 2;
 const LAYOUT_MAGAZINE = 3;
-
+const TTS_LANGUAGE = 'ttslanguage';
 const TTS_NORMAL = 0;
 const TTS_SLOW = 1;
 const TTS_VERYSLOW = 2;
@@ -301,7 +301,7 @@ const M_STANDARD_FONTS = ["Arial", "Arial Black", "Verdana", "Tahoma", "Trebuche
 
 const M_GOOGLE_FONTS = ["Andika"];
 
-const M_EXTRA_FIELDS = ['type','iteminstructions','itemtext', 'itemtextformat','itemtts','itemttsvoice','itemttsoption',
+const M_EXTRA_FIELDS = ['type','ttslanguage','iteminstructions','itemtext', 'itemtextformat','itemtts','itemttsvoice','itemttsoption',
     'itemytid','itemytstart','itemytend',
     'itemttsautoplay', 'itemaudiofname','itemtextarea','itemttsdialog', 'itemttsdialogopts','itemttspassage','itemttspassageopts', 'customtext1', 'customtext1format','customtext2', 'customtext2format','customtext3',
     'customtext3format','customtext4', 'customtext4format','customtext5', 'customtext5format',
@@ -309,6 +309,6 @@ const M_EXTRA_FIELDS = ['type','iteminstructions','itemtext', 'itemtextformat','
     'customint1','customint2', 'customint3','customint4', 'customint5','layout','correctanswer','timelimit',
     'timemodified','rsquestionkey','passagehash','alternatives','phonetic','createdby','modifiedby'];
 
-const M_FILE_AREAS = [];
+const M_FILE_AREAS = [self::MEDIAQUESTION,self::AUDIOPROMPT];
 
 }

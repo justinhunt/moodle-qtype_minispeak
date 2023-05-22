@@ -38,8 +38,8 @@ class item_speakinggapfill extends item {
      * The class constructor.
      *
      */
-    public function __construct($itemrecord, $moduleinstance=false, $context=false){
-        parent::__construct($itemrecord, $moduleinstance, $context);
+    public function __construct($question,$context){
+        parent::__construct($question, $context);
         $this->needs_speechrec=true;
     }
 

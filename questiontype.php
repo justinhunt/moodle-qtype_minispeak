@@ -89,7 +89,7 @@ class qtype_minispeak extends question_type {
         $context = $question->context;
 
         //we pass in $question as itemrecord, and moduleinstance, so the signature is consistent with minilesson
-        $theitem= utils::fetch_item_from_itemrecord($question,$question,$context);
+        $theitem= utils::fetch_item_from_question($question,$question,$context);
         //TO DO fix up $olditem
         $olditem=false;
 
@@ -118,7 +118,7 @@ class qtype_minispeak extends question_type {
         question_bank::load_question_definition_classes($this->name());
         $class = 'qtype_minispeak_question';
         $q = new $class();
-        $q->ttslanguage=get_config(constants::M_COMPONENT,'ttslanguage');
+      //  $q->ttslanguage=get_config(constants::M_COMPONENT,'ttslanguage');
         return $q;
     }
 
@@ -131,6 +131,7 @@ class qtype_minispeak extends question_type {
         foreach (constants::M_EXTRA_FIELDS as $field) {
             $question->{$field} = $questiondata->options->{$field};
         }
+        $question->itemid = $questiondata->options->id;
     }
 
     /**

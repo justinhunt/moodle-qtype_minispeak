@@ -159,7 +159,7 @@ class helper
         $updates=0;
         $itemrecords = $DB->get_records(constants:: M_QTABLE,array('minispeak'=>$moduleinstance->id));
         foreach($itemrecords as $itemrecord) {
-            $theitem =  utils::fetch_item_from_itemrecord($itemrecord,$moduleinstance);
+            $theitem =  utils::fetch_item_from_question($itemrecord,$moduleinstance);
             $olditemrecord=false;
             $updated = $theitem->update_create_langmodel($olditemrecord);
             if($updated) {
@@ -177,7 +177,7 @@ class helper
         $updates=0;
         $itemrecords = $DB->get_records(constants:: M_QTABLE,array('minispeak'=>$moduleinstance->id));
         foreach($itemrecords as $itemrecord) {
-            $item =  utils::fetch_item_from_itemrecord($itemrecord,$moduleinstance);
+            $item =  utils::fetch_item_from_question($itemrecord,$moduleinstance);
             $olditem = false;
             $phonetic = $item->update_create_phonetic($olditem);
             if(!empty($phonetic)){

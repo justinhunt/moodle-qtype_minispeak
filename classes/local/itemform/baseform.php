@@ -192,14 +192,14 @@ abstract class baseform  {
          //   $this->addElement('hidden', 'type');
          //   $mform->setType('type', PARAM_TEXT);
 			
-
+/*
 
             $this->addElement('text', 'name', get_string('itemtitle', constants::M_COMPONENT), array('size'=>70));
             $mform->setType('name', PARAM_TEXT);
             $mform->addRule('name', get_string('required'), 'required', null, 'client');
             $typelabel =get_string($this->type,constants::M_COMPONENT);
             $mform->setDefault('name', get_string('newitem',constants::M_COMPONENT, $typelabel));
-
+*/
 
 
                 //Question instructions

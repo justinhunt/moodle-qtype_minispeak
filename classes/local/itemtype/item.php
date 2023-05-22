@@ -71,8 +71,8 @@ abstract class item implements templatable, renderable {
      * The class constructor.
      *
      */
-    public function __construct($itemrecord, $moduleinstance=false, $context=false){
-        $this->from_record($itemrecord, $moduleinstance, $context);
+    public function __construct($question, $context){
+        $this->from_question($question,$context);
     }
 
     /**
@@ -99,21 +99,31 @@ abstract class item implements templatable, renderable {
      * @param int $currentnumber The current number in the lesson
      * @param \stdClass $itemrecord The db record for the item.
      */
-    public function from_record($itemrecord, $questioninstance, $context) {
+    public function from_question($question, $context) {
         global $DB;
         $config=get_config(constants::M_COMPONENT);
-        $this->itemrecord = $itemrecord;
+
+        if(isset($question->itemid) && !empty($question->itemid)) {
+            $this->itemrecord = $DB->get_record(constants::M_QTABLE,['id'=>$question->itemid],'*', MUST_EXIST);
+        }else {
+
+            //extraxt the options from the question, and save them in the itemrecord
+            $itemrecord = new \stdClass();
+            foreach (constants::M_EXTRA_FIELDS as $field) {
+                if (isset($question->{$field})) {
+                    $itemrecord->{$field} = $question->{$field};
+                }
+            }
+            $this->itemrecord = $itemrecord;
+        }
+
+
         $this->context = $context;
         $this->region= $config->awsregion;
-        $this->language= $itemrecord->ttslanguage;
+        $this->language= isset($this->itemrecord->ttslanguage) ? $this->itemrecord->ttslanguage : $config->ttslanguage;
 
-        //we need to set the module instance which is also the itemrecord, because in minilesson some settings are in the minilesson module instance
-        //so we can copy paste as much code as possible we do this, though its a bit yuck
-        if(!$questioninstance){
-            $this->moduleinstance = $DB->get_record(constants::M_TABLE,['id'=>$this->itemrecord->questionid],'*', MUST_EXIST);
-        }else{
-            $this->moduleinstance=$questioninstance;
-        }
+        //we call the question module instance, for consistency with minilesson, so we can copy and paste without lots of fiddling
+        $this->moduleinstance=$question;
 
 
         if(!empty($token)) {
@@ -167,7 +177,6 @@ abstract class item implements templatable, renderable {
         $testitem->correctanswer =  $this->itemrecord->correctanswer;
         $testitem->id = $this->itemrecord->id;
         $testitem->type=$this->itemrecord->type;
-        $testitem->name=$this->itemrecord->name;
         $testitem->timelimit=$this->itemrecord->timelimit;
         if($this->forcetitles){$testitem->title=$this->itemrecord->name;}
         $testitem->uniqueid=$this->itemrecord->type . $testitem->number;
@@ -181,7 +190,7 @@ abstract class item implements templatable, renderable {
         $itemtext =  file_rewrite_pluginfile_urls($itemrecord->{constants::TEXTQUESTION},
             'pluginfile.php', $this->context->id,constants::M_COMPONENT,
             constants::TEXTQUESTION_FILEAREA, $testitem->id);
-        $itemtext = format_text($itemtext, FORMAT_MOODLE, $editoroptions);
+  //      $itemtext = format_text($itemtext, FORMAT_MOODLE, $editoroptions);
         if(!empty($itemtext)) {
             $testitem->itemtext = $itemtext;
         }
@@ -676,12 +685,10 @@ abstract class item implements templatable, renderable {
 
         $theitem = new \stdClass;
         $theitem->questionid = $this->moduleinstance->id;
-        if(!isset($theitem->id)&&isset($data->itemid)){
-            $theitem->id = $data->itemid;
-        }
+
+
 
         $theitem->type = $data->type;
-        $theitem->name = $data->name;
         $theitem->phonetic = $data->phonetic;
         $theitem->passagehash = $data->passagehash;
         $theitem->modifiedby = $USER->id;
@@ -689,7 +696,9 @@ abstract class item implements templatable, renderable {
 
         //first insert a new item if we need to
         //that will give us a itemid, we need that for saving files
-        if (empty($data->itemid)) {
+        if(isset($data->id) && !empty($data->id)){
+            $theitem->id = $data->id;
+        }else {
 
             $theitem->{constants::TEXTQUESTION} = '';
             $theitem->timecreated = time();
@@ -736,7 +745,15 @@ abstract class item implements templatable, renderable {
             $theitem->{constants::LAYOUT} = constants::LAYOUT_AUTO;
         }
 
+        //language
+        if (property_exists($data, constants::TTS_LANGUAGE)) {
+            $theitem->{constants::TTS_LANGUAGE} = $data->{constants::TTS_LANGUAGE};
+        }else{
+            $theitem->{constants::TTS_LANGUAGE} = constants::M_LANG_ENUS;
+        }
+
         //Item media
+        //NB here we use the question id, because later it is the id of the question item that we use to fetch the file
         if (property_exists($data, constants::MEDIAQUESTION)) {
             file_save_draft_area_files($data->{constants::MEDIAQUESTION},
                 $this->context->id, constants::M_COMPONENT,
