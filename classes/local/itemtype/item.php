@@ -102,20 +102,22 @@ abstract class item implements templatable, renderable {
     public function from_question($question, $context) {
         global $DB;
         $config=get_config(constants::M_COMPONENT);
-
-        if(isset($question->itemid) && !empty($question->itemid)) {
-            $this->itemrecord = $DB->get_record(constants::M_QTABLE,['id'=>$question->itemid],'*', MUST_EXIST);
-        }else {
-
-            //extraxt the options from the question, and save them in the itemrecord
-            $itemrecord = new \stdClass();
-            foreach (constants::M_EXTRA_FIELDS as $field) {
-                if (isset($question->{$field})) {
-                    $itemrecord->{$field} = $question->{$field};
-                }
-            }
-            $this->itemrecord = $itemrecord;
+        $itemrecord=false;
+        if(isset($question->id) && !empty($question->id)) {
+            $itemrecord = $DB->get_record(constants::M_QTABLE, ['questionid' => $question->id]);
         }
+        if(!$itemrecord){
+            $itemrecord = new \stdClass();
+        }
+
+        //extract the options from the question, and save them in the itemrecord
+        foreach (constants::M_EXTRA_FIELDS as $field) {
+            if (isset($question->{$field})) {
+                $itemrecord->{$field} = $question->{$field};
+            }
+        }
+        $this->itemrecord = $itemrecord;
+
 
 
         $this->context = $context;

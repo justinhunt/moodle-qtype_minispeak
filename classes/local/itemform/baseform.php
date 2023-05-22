@@ -141,6 +141,13 @@ abstract class baseform  {
         }
     }
 
+    function setDefault($fieldname,$defaultvalue){
+        $mform = $this->_form;
+        if (is_null($mform->getElementValue($fieldname))) {
+            $mform->setDefault($fieldname, $defaultvalue);
+        }
+    }
+
     /**
      * Adds an element group
      * @param    array      $elements       array of elements composing the group
@@ -214,71 +221,71 @@ abstract class baseform  {
                 switch($this->itemtype) {
 
                     case constants::TYPE_PAGE:
-                        $mform->setDefault(constants::TEXTINSTRUCTIONS,
+                        $this->setDefault(constants::TEXTINSTRUCTIONS,
                             '');
                         break;
 
                     case constants::TYPE_LISTENREPEAT:
-                        $mform->setDefault(constants::TEXTINSTRUCTIONS,
+                        $this->setDefault(constants::TEXTINSTRUCTIONS,
                                 get_string('lr_instructions1', constants::M_COMPONENT));
                         break;
                     case constants::TYPE_DICTATIONCHAT:
-                        $mform->setDefault(constants::TEXTINSTRUCTIONS,
+                        $this->setDefault(constants::TEXTINSTRUCTIONS,
                                 get_string('dc_instructions1', constants::M_COMPONENT));
                         break;
                     case constants::TYPE_SPEECHCARDS:
-                        $mform->setDefault(constants::TEXTINSTRUCTIONS,
+                        $this->setDefault(constants::TEXTINSTRUCTIONS,
                                 get_string('sc_instructions1', constants::M_COMPONENT));
                         break;
                      case constants::TYPE_DICTATION:
-                         $mform->setDefault(constants::TEXTINSTRUCTIONS,
+                         $this->setDefault(constants::TEXTINSTRUCTIONS,
                                  get_string('dictation_instructions1', constants::M_COMPONENT));
                          break;
 
                      case constants::TYPE_MULTIAUDIO:
-                         $mform->setDefault(constants::TEXTINSTRUCTIONS,
+                         $this->setDefault(constants::TEXTINSTRUCTIONS,
                              get_string('multiaudio_instructions1', constants::M_COMPONENT));
                          break;
 
                     case constants::TYPE_MULTICHOICE:
-                        $mform->setDefault(constants::TEXTINSTRUCTIONS,
+                        $this->setDefault(constants::TEXTINSTRUCTIONS,
                             get_string('multichoice_instructions1', constants::M_COMPONENT));
                         break;
 
                     case constants::TYPE_SHORTANSWER:
-                        $mform->setDefault(constants::TEXTINSTRUCTIONS,
+                        $this->setDefault(constants::TEXTINSTRUCTIONS,
                             get_string('shortanswer_instructions1', constants::M_COMPONENT));
                         break;
 
                     case constants::TYPE_SMARTFRAME:
-                        $mform->setDefault(constants::TEXTINSTRUCTIONS,
+                        $this->setDefault(constants::TEXTINSTRUCTIONS,
                             get_string('smartframe_instructions1', constants::M_COMPONENT));
                         break;
                     //listening gapfill
                     case constants::TYPE_LGAPFILL:
-                        $mform->setDefault(constants::TEXTINSTRUCTIONS,
+                        $this->setDefault(constants::TEXTINSTRUCTIONS,
                             get_string('lg_instructions1', constants::M_COMPONENT));
                         break;
                     //typing gapfill
                     case constants::TYPE_TGAPFILL:
-                        $mform->setDefault(constants::TEXTINSTRUCTIONS,
+                        $this->setDefault(constants::TEXTINSTRUCTIONS,
                             get_string('tg_instructions1', constants::M_COMPONENT));
                         break;
                     //speaking gapfill
                     case constants::TYPE_SGAPFILL:
-                        $mform->setDefault(constants::TEXTINSTRUCTIONS,
+                        $this->setDefault(constants::TEXTINSTRUCTIONS,
                             get_string('sg_instructions1', constants::M_COMPONENT));
                         break;
 
                     //comprehension quiz
                     case constants::TYPE_COMPQUIZ:
-                        $mform->setDefault(constants::TEXTINSTRUCTIONS,
+                        $this->setDefault(constants::TEXTINSTRUCTIONS,
                             get_string('listeningquiz_instructions1', constants::M_COMPONENT));
                         break;
 
                     //button quiz
                     case constants::TYPE_BUTTONQUIZ:
-                        $mform->setDefault(constants::TEXTINSTRUCTIONS,
+                        $this->setDefault(constants::TEXTINSTRUCTIONS,
                             get_string('buttonquiz_instructions1', constants::M_COMPONENT));
                         break;
                 }
@@ -286,7 +293,7 @@ abstract class baseform  {
                 //tts options
                 $langoptions = utils::get_lang_options();
                 $this->addElement('select', 'ttslanguage', get_string('ttslanguage', constants::M_COMPONENT), $langoptions);
-                $mform->setDefault('ttslanguage',$config->ttslanguage);
+                $this->setDefault('ttslanguage',$config->ttslanguage);
 
                 $togglearray=array();
                 $togglearray[] =& $mform->createElement('advcheckbox','addmedia',get_string('addmedia',constants::M_COMPONENT),'');
@@ -299,7 +306,7 @@ abstract class baseform  {
                 $this->addGroup($togglearray, 'togglearray', get_string('mediaprompts', constants::M_COMPONENT), array(' '), false);
                 //in the case of page we assume they will want to use some media
                 if($this->type== constants::TYPE_PAGE) {
-                    $mform->setDefault('addmedia', 1);
+         //           $this->setDefault('addmedia', 1);
                 }
 
                 //Question media upload
@@ -392,7 +399,7 @@ abstract class baseform  {
             $this->addElement('textarea', constants::TTSDIALOG, get_string('ttsdialog', constants::M_COMPONENT), array('wrap'=>'virtual','style'=>'width: 100%;','placeholder'=>'A) Hello&#10;B) Goodbye'));
             $mform->setType(constants::TTSDIALOG, PARAM_RAW);
             $this->addElement('advcheckbox',constants::TTSDIALOGVISIBLE,get_string('ttsdialogvisible',constants::M_COMPONENT),get_string('ttsdialogvisible_desc', constants::M_COMPONENT));
-            $mform->setDefault(constants::TTSDIALOGVISIBLE, 1);
+            $this->setDefault(constants::TTSDIALOGVISIBLE, 1);
 
             if($m35){
                 $mform->hideIf('ttsdialog_grp', 'addttsdialog', 'neq', 1);
