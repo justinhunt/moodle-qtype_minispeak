@@ -309,6 +309,11 @@ const M_EXTRA_FIELDS = ['type','ttslanguage','iteminstructions','itemtext', 'ite
     'customint1','customint2', 'customint3','customint4', 'customint5','layout','correctanswer','timelimit',
     'timemodified','rsquestionkey','passagehash','alternatives','phonetic','createdby','modifiedby'];
 
-const M_FILE_AREAS = [self::MEDIAQUESTION,self::AUDIOPROMPT];
+const M_FILE_AREAS = [self::MEDIAQUESTION,self::AUDIOPROMPT,constants::TEXTPROMPT_FILEAREA,
+    constants::TEXTPROMPT_FILEAREA . '1',
+    constants::TEXTPROMPT_FILEAREA . '2',
+    constants::TEXTPROMPT_FILEAREA . '3',
+    constants::TEXTPROMPT_FILEAREA . '4'];
+
 
 }

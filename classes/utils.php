@@ -1328,7 +1328,7 @@ class utils{
         }
     }
 
-    public static function fetch_data_for_js($item,$moduleinstance,$context){
+    public static function fetch_data_for_js($question,$context, $questionattempt){
         global $CFG,  $OUTPUT;
 
 
@@ -1353,8 +1353,9 @@ class utils{
 
 
         //prepare data
-        $theitem=utils::fetch_item_from_question($item,$moduleinstance,$context);
+        $theitem=utils::fetch_item_from_question($question,$context);
         $theitem->set_token($token);
+        $theitem->set_questionattempt($questionattempt);
 
         //add our item to test
         $renderer=$OUTPUT;
@@ -1444,6 +1445,20 @@ class utils{
         $output .= $OUTPUT->notification($msg, 'warning');
         $output .= $OUTPUT->box_end();
         return $output;
+    }
+
+    public static function fetch_editor_options( $modulecontext)
+    {
+        $maxfiles = 99;
+        $maxbytes = 0;
+        return array('trusttext' => 0,'noclean'=>1, 'subdirs' => true, 'maxfiles' => $maxfiles,
+            'maxbytes' => $maxbytes, 'context' => $modulecontext);
+    }
+
+    public static function fetch_filemanager_options($maxfiles = 1)
+    {
+        $maxbytes = 0;
+        return array('subdirs' => true, 'maxfiles' => $maxfiles, 'maxbytes' => $maxbytes, 'accepted_types' => array('audio', 'video','image'));
     }
 
 }

@@ -89,7 +89,7 @@ class qtype_minispeak extends question_type {
         $context = $question->context;
 
         //we pass in $question as itemrecord, and moduleinstance, so the signature is consistent with minilesson
-        $theitem= utils::fetch_item_from_question($question,$question,$context);
+        $theitem= utils::fetch_item_from_question($question,$context);
         //TO DO fix up $olditem
         $olditem=false;
 

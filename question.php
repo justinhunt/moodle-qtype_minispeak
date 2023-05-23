@@ -28,6 +28,9 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/question/type/questionbase.php');
 
+use \qtype_minispeak\constants;
+use \qtype_minispeak\utils;
+
 /**
  * Base class for Minispeak questions. The parts that are common to
  * single select and multiple select.
@@ -141,10 +144,12 @@ abstract class qtype_minispeak_base extends question_graded_automatically {
     public abstract function is_choice_selected($response, $value);
 
     public function check_file_access($qa, $options, $component, $filearea, $args, $forcedownload) {
-
-            return parent::check_file_access($qa, $options, $component, $filearea,
-                    $args, $forcedownload);
-
+        if ($component == constants::M_COMPONENT && in_array($filearea, constants::M_FILE_AREAS)) {
+            return true;
+        } else {
+            return parent::check_file_access($qa, $options, $component,
+                $filearea, $args, $forcedownload);
+        }
     }
 
     /**

@@ -143,7 +143,7 @@ abstract class baseform  {
 
     function setDefault($fieldname,$defaultvalue){
         $mform = $this->_form;
-        if (is_null($mform->getElementValue($fieldname))) {
+        if ($mform->elementExists($fieldname) && is_null($mform->getElementValue($fieldname))) {
             $mform->setDefault($fieldname, $defaultvalue);
         }
     }
@@ -306,7 +306,7 @@ abstract class baseform  {
                 $this->addGroup($togglearray, 'togglearray', get_string('mediaprompts', constants::M_COMPONENT), array(' '), false);
                 //in the case of page we assume they will want to use some media
                 if($this->type== constants::TYPE_PAGE) {
-         //           $this->setDefault('addmedia', 1);
+                    $this->setDefault('addmedia', 1);
                 }
 
                 //Question media upload
@@ -354,7 +354,7 @@ abstract class baseform  {
                         get_string('itemtextarea', constants::M_COMPONENT),
                         array('id' => $someid, 'wrap' => 'virtual', 'style' => 'width: 100%;', 'rows' => '5'),
                         $edoptions);
-                $this->_form->setDefault(constants::QUESTIONTEXTAREA . '_editor', array('text' => '', 'format' => FORMAT_HTML));
+                $this->setDefault(constants::QUESTIONTEXTAREA . '_editor', array('text' => '', 'format' => FORMAT_HTML));
                 $mform->setType(constants::QUESTIONTEXTAREA, PARAM_RAW);
                 $this->addGroup($groupelements, 'groupelements', get_string('itemtextarea', constants::M_COMPONENT), array(' '), false);
                 if($m35){
@@ -505,7 +505,7 @@ abstract class baseform  {
 
         $this->addElement('select', $name, $label, $options);
         if($default!==false) {
-            $this->_form->setDefault($name, $default);
+            $this->setDefault($name, $default);
         }
 
     }
@@ -540,7 +540,7 @@ abstract class baseform  {
         }
         //edoptions = array('noclean'=>true)
         $this->addElement('editor', constants::TEXTANSWER .$count. '_editor', $label, array('rows'=>'4', 'columns'=>'80'), $this->editoroptions);
-        $this->_form->setDefault(constants::TEXTANSWER .$count. '_editor', array('text'=>'', 'format'=>FORMAT_MOODLE));
+        $this->setDefault(constants::TEXTANSWER .$count. '_editor', array('text'=>'', 'format'=>FORMAT_MOODLE));
         if ($required) {
             $this->_form->addRule(constants::TEXTANSWER .$count. '_editor', get_string('required'), 'required', null, 'client');
         }
@@ -600,7 +600,7 @@ abstract class baseform  {
         $options['3']=3;
         $options['4']=4;
         $this->addElement('select', constants::CORRECTANSWER, $label,$options);
-        $this->_form->setDefault(constants::CORRECTANSWER, 1);
+        $this->setDefault(constants::CORRECTANSWER, 1);
         $this->_form->setType(constants::CORRECTANSWER, PARAM_INT);
     }
 
@@ -673,7 +673,7 @@ abstract class baseform  {
         global $CFG;
         if(empty($label)){$label = get_string('confirmchoice_formlabel', constants::M_COMPONENT);}
         $this->addElement('selectyesno', $name,$label);
-        $this->_form->setDefault( $name,0);
+        $this->setDefault( $name,0);
     }
 
     /**
@@ -710,7 +710,7 @@ abstract class baseform  {
     protected final function add_timelimit($name, $label, $default=false) {
         $this->addElement('duration', $name, $label, ['optional' => true, 'defaultunit' => 1]);
         if ($default !== false) {
-            $this->_form->setDefault($name, $default);
+            $this->setDefault($name, $default);
         }
     }
 
@@ -727,7 +727,7 @@ abstract class baseform  {
             get_string('allowretry',constants::M_COMPONENT),
             get_string('allowretry_desc',constants::M_COMPONENT),[],[0,1]);
             if ($default !== 0) {
-                $this->_form->setDefault($name, 1);
+                $this->setDefault($name, 1);
             }
     }
 }

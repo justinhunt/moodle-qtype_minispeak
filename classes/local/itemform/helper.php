@@ -112,13 +112,8 @@ class helper
 
         //copy files
         $fs = get_file_storage();
-        $fileareas = array(constants::TEXTPROMPT_FILEAREA,
-            constants::TEXTPROMPT_FILEAREA . '1',
-            constants::TEXTPROMPT_FILEAREA . '2',
-            constants::TEXTPROMPT_FILEAREA . '3',
-            constants::TEXTPROMPT_FILEAREA . '4',
-            constants::MEDIAQUESTION);
-        
+        $fileareas = constants::M_FILE_AREAS;
+
         //file record
         $newfilerecord = new \stdClass();
         $newfilerecord->userid = $USER->id;

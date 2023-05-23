@@ -45,7 +45,8 @@ class qtype_minispeak_renderer extends qtype_with_combined_feedback_renderer {
 
         $question = $qa->get_question();
       //  $response = $question->get_response($qa);
-        $itemdata = utils::fetch_data_for_js($question, $question, $options->context);
+        $context = context::instance_by_id($question->contextid);
+        $itemdata = utils::fetch_data_for_js($question, $context, $qa);
         $itemdata->preview=true;
 
 

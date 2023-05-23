@@ -42,6 +42,9 @@ abstract class item implements templatable, renderable {
     /** @var int $id The current number in the lesson/container */
     protected $currentnumber;
 
+    /** @var \stdClass $questionattempt */
+    protected $questionattempt;
+
     /** @var \stdClass $itemrecord The db record for the item. */
     protected $itemrecord;
 
@@ -116,7 +119,15 @@ abstract class item implements templatable, renderable {
                 $itemrecord->{$field} = $question->{$field};
             }
         }
+        //extract any file area stuff
+        foreach (constants::M_FILE_AREAS as $filearea){
+            if (isset($question->{$filearea})) {
+                $itemrecord->{$filearea} = $question->{$filearea};
+            }
+        }
+
         $this->itemrecord = $itemrecord;
+        $this->question=$question;
 
 
 
@@ -131,8 +142,8 @@ abstract class item implements templatable, renderable {
         if(!empty($token)) {
             $this->token = $token;
         }
-        $this->editoroptions = self::fetch_editor_options($this->context);
-        $this->filemanageroptions = self::fetch_filemanager_options();
+        $this->editoroptions = utils::fetch_editor_options($this->context);
+        $this->filemanageroptions = utils::fetch_filemanager_options();
 
         // TO DO set these props
         /*
@@ -143,10 +154,14 @@ abstract class item implements templatable, renderable {
 
     }
 
+    public function set_questionattempt($questionattempt){
+        $this->questionattempt = $questionattempt;
+    }
 
     public function set_token($token){
         $this->token = $token;
     }
+
     public function set_currentnumber($currentnumber){
         $this->currentnumber = $currentnumber;
     }
@@ -656,19 +671,39 @@ abstract class item implements templatable, renderable {
         return $dots;
     }
 
+    protected function fetch_media_files($filearea,$item){
+        //get question audio div (not so easy)
+        $fs = get_file_storage();
+        $files = $fs->get_area_files($this->context->id,  constants::M_COMPONENT,$filearea,$item->questionid);
+        return $files;
+    }
+
     protected function fetch_media_urls($filearea,$item){
         //get question audio div (not so easy)
         $fs = get_file_storage();
-        $files = $fs->get_area_files($this->context->id,  constants::M_COMPONENT,$filearea,$item->id);
+        $files = $fs->get_area_files($this->context->id,  constants::M_COMPONENT,$filearea,$item->questionid);
         $urls=[];
+
         foreach ($files as $file) {
             $filename = $file->get_filename();
+
             if($filename=='.'){continue;}
+
             $filepath = '/';
-            $mediaurl = \moodle_url::make_pluginfile_url($this->context->id, constants::M_COMPONENT,
-                $filearea, $item->id,
-                $filepath, $filename);
-            $urls[]= $mediaurl->__toString();
+            if($this->questionattempt){
+                $mediaurl =$this->questionattempt->rewrite_pluginfile_urls('@@PLUGINFILE@@/' .
+                    $file->get_filename(),
+                    $file->get_component(),
+                    $file->get_filearea() ,
+                    $file->get_itemid());
+                $urls[] = $mediaurl;
+            }else {
+                $mediaurl = \moodle_url::make_pluginfile_url($this->context->id, constants::M_COMPONENT,
+                    $filearea, $item->id,
+                    $filepath, $filename);
+
+                $urls[] = $mediaurl->out(false);
+            }
 
         }
         return $urls;
@@ -759,7 +794,7 @@ abstract class item implements templatable, renderable {
         if (property_exists($data, constants::MEDIAQUESTION)) {
             file_save_draft_area_files($data->{constants::MEDIAQUESTION},
                 $this->context->id, constants::M_COMPONENT,
-                constants::MEDIAQUESTION, $theitem->id,
+                constants::MEDIAQUESTION, $theitem->questionid,
                 $this->filemanageroptions);
         }
 
@@ -880,45 +915,25 @@ abstract class item implements templatable, renderable {
         }
     }//end of edit_insert_question
 
-    public static function delete_item($itemid, $contextid)
+    public static function delete_item($questionid, $contextid)
     {
         global $DB;
         $ret = false;
 
-        if (!$DB->delete_records(constants::M_QTABLE, array('id' => $itemid))) {
+        if (!$DB->delete_records(constants::M_QTABLE, array('questionid' => $questionid))) {
             print_error("Could not delete item");
             return $ret;
         }
         //remove files
         $fs = get_file_storage();
 
-        $fileareas = array(constants::TEXTPROMPT_FILEAREA,
-            constants::TEXTPROMPT_FILEAREA . '1',
-            constants::TEXTPROMPT_FILEAREA . '2',
-            constants::TEXTPROMPT_FILEAREA . '3',
-            constants::TEXTPROMPT_FILEAREA . '4',
-            constants::MEDIAQUESTION);
+        $fileareas = constants::M_FILE_AREAS;
 
         foreach ($fileareas as $filearea) {
-            $fs->delete_area_files($contextid, constants::M_COMPONENT, $filearea, $itemid);
+            $fs->delete_area_files($contextid, constants::M_COMPONENT, $filearea, $questionid);
         }
         $ret = true;
         return $ret;
-    }
-
-
-    public static function fetch_editor_options( $modulecontext)
-    {
-        $maxfiles = 99;
-        $maxbytes = 0;
-        return array('trusttext' => 0,'noclean'=>1, 'subdirs' => true, 'maxfiles' => $maxfiles,
-            'maxbytes' => $maxbytes, 'context' => $modulecontext);
-    }
-
-    public static function fetch_filemanager_options($maxfiles = 1)
-    {
-        $maxbytes = 0;
-        return array('subdirs' => true, 'maxfiles' => $maxfiles, 'maxbytes' => $maxbytes, 'accepted_types' => array('audio', 'video','image'));
     }
 
 

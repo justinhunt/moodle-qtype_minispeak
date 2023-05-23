@@ -129,6 +129,23 @@ class qtype_minispeak_edit_form extends question_edit_form {
 */
     protected function data_preprocessing($question) {
         $question = parent::data_preprocessing($question);
+
+        //Set qresource details, and configure a draft area to accept any uploaded pictures
+        //all this and this whole method does, is to load existing files into a filearea
+        //so it is not called when creating a new question, only when editing an existing one
+
+        //best to use file_get_submitted_draft_itemid - because copying questions gets weird otherwise
+        //$draftitemid =$question->options->qresource;
+        foreach(constants::M_FILE_AREAS as $filearea){
+            $draftitemid = file_get_submitted_draft_itemid($filearea);
+
+            file_prepare_draft_area($draftitemid, $this->context->id, constants::M_COMPONENT,
+                $filearea,
+                !empty($question->id) ? (int) $question->id : null,
+                utils::fetch_filemanager_options());
+            $question->{$filearea} = $draftitemid;
+        }
+
     //    $question = $this->data_preprocessing_answers($question, true);
      //   $question = $this->data_preprocessing_combined_feedback($question, true);
    //     $question = $this->data_preprocessing_hints($question, true, true);
