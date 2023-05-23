@@ -217,68 +217,9 @@ class utils{
 
         $message = '';
         $returndata=false;
+        $result = true;
 
-        $cm = get_coursemodule_from_id(constants::M_MODNAME, $cmid, 0, false, MUST_EXIST);
-        $modulecontext = \context_module::instance($cm->id);
-        $moduleinstance  = $DB->get_record(constants::M_MODNAME, array('id' => $cm->instance), '*', MUST_EXIST);
-        $attempts = $DB->get_records(constants::M_ATTEMPTSTABLE,array('moduleid'=>$moduleinstance->id,'userid'=>$USER->id),'id DESC');
-
-        //get or create attempt
-        if(!$attempts){
-            $latestattempt = self::create_new_attempt($moduleinstance->course, $moduleinstance->id);
-        }else{
-            $latestattempt = reset($attempts);
-        }
-
-        //get or create sessiondata
-        if(empty($latestattempt->sessiondata)){
-            $sessiondata = new \stdClass();
-            $sessiondata->steps = [];
-        }else{
-            $sessiondata = json_decode($latestattempt->sessiondata);
-        }
-
-        //if sessiondata is not an array, reconstruct it as an array
-        if(!is_array($sessiondata->steps)){
-            $sessiondata->steps = self::remake_steps_as_array($sessiondata->steps);
-        }
-        //add our latest step to session
-        $sessiondata->steps[$stepdata->index]=$stepdata;
-
-        //grade quiz results
-        $comp_test =  new comprehensiontest($cm);
-        $totalitems = $comp_test->fetch_item_count();
-
-        //close out the attempt and update the grade
-        //there should never be more steps than items
-        //[hack] but there seem to be times when there are fewer( when an update_step_grade failed or didnt arrive),
-        // so we also allow the final item. Though it's not ideal because we will have missed one or more
-        if($totalitems <= count($sessiondata->steps) || $stepdata->index==$totalitems-1) {
-            $newgrade=true;
-            $latestattempt->sessionscore = self::calculate_session_score($sessiondata->steps);
-            $latestattempt->status =constants::M_STATE_COMPLETE;
-            \qtype_minispeak\event\attempt_submitted::create_from_attempt($latestattempt, $modulecontext)->trigger();
-        }else{
-            $newgrade=false;
-        }
-
-        //update the record
-        $latestattempt->sessiondata = json_encode($sessiondata);
-        $result = $DB->update_record(constants::M_ATTEMPTSTABLE, $latestattempt);
-        if($result) {
-            $returndata= '';
-            if($newgrade) {
-                require_once($CFG->dirroot . constants::M_PATH . '/lib.php');
-                //::TO DO minilesson -> question here
-               // minilesson_update_grades($moduleinstance, $USER->id, false);
-                //tell JS about the grade situation
-
-            }
-        }else{
-            $message = 'unable to update attempt record';
-        }
-
-        //return_to_page($result,$message,$returndata);
+        //return_to_page -  just a placeholder function
         return [$result,$message,$returndata];
     }
 
@@ -1275,10 +1216,10 @@ class utils{
         $ret[constants::TYPE_SPEECHCARDS] = get_string('speechcards', constants::M_COMPONENT);
         $ret[constants::TYPE_LISTENREPEAT] = get_string('listenrepeat', constants::M_COMPONENT);
         $ret[constants::TYPE_PAGE] = get_string('page', constants::M_COMPONENT);
-        $ret[constants::TYPE_SMARTFRAME] = get_string('smartframe', constants::M_COMPONENT);
+        //$ret[constants::TYPE_SMARTFRAME] = get_string('smartframe', constants::M_COMPONENT);
         $ret[constants::TYPE_SHORTANSWER] = get_string('shortanswer', constants::M_COMPONENT);
-        $ret[constants::TYPE_COMPQUIZ] = get_string('compquiz', constants::M_COMPONENT);
-        $ret[constants::TYPE_BUTTONQUIZ] = get_string('buttonquiz', constants::M_COMPONENT);
+        //$ret[constants::TYPE_COMPQUIZ] = get_string('compquiz', constants::M_COMPONENT);
+       // $ret[constants::TYPE_BUTTONQUIZ] = get_string('buttonquiz', constants::M_COMPONENT);
         $ret[constants::TYPE_SGAPFILL] = get_string('sgapfill', constants::M_COMPONENT);
         $ret[constants::TYPE_LGAPFILL] = get_string('lgapfill', constants::M_COMPONENT);
         $ret[constants::TYPE_TGAPFILL] = get_string('tgapfill', constants::M_COMPONENT);

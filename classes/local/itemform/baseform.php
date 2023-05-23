@@ -196,99 +196,25 @@ abstract class baseform  {
         $mform->setType('itemid', PARAM_INT);
 
         if ($this->standard === true) {
-         //   $this->addElement('hidden', 'type');
-         //   $mform->setType('type', PARAM_TEXT);
-			
-/*
-
-            $this->addElement('text', 'name', get_string('itemtitle', constants::M_COMPONENT), array('size'=>70));
-            $mform->setType('name', PARAM_TEXT);
-            $mform->addRule('name', get_string('required'), 'required', null, 'client');
-            $typelabel =get_string($this->type,constants::M_COMPONENT);
-            $mform->setDefault('name', get_string('newitem',constants::M_COMPONENT, $typelabel));
-*/
 
 
-                //Question instructions
-                $this->addElement('text', constants::TEXTINSTRUCTIONS, get_string('iteminstructions', constants::M_COMPONENT), array('size'=>70));
+                //Question instructions:
+                $this->addElement('text', constants::TEXTINSTRUCTIONS, get_string('iteminstructions', constants::M_COMPONENT),
+                    array('size'=>70,'data-itemtypechooser-field' => 'typeInstructions'));
+                //$this->addElement('hidden', constants::TEXTINSTRUCTIONS, '');
                 $mform->setType(constants::TEXTINSTRUCTIONS, PARAM_RAW);
 
-                //Question text
-                $this->addElement('textarea', constants::TEXTQUESTION, get_string('itemcontents', constants::M_COMPONENT), array('wrap'=>'virtual','style'=>'width: 100%;'));
+                //Question text: We show this in MiniLesson, but hide it in minispeak. Just in case we need it later, we'll keep it here
+                //$this->addElement('textarea', constants::TEXTQUESTION, get_string('itemcontents', constants::M_COMPONENT), array('wrap'=>'virtual','style'=>'width: 100%;'));
+                $this->addElement('hidden', constants::TEXTQUESTION, '');
                 $mform->setType(constants::TEXTQUESTION, PARAM_RAW);
+
                 //add layout
                 $this->add_layoutoptions();
-                switch($this->itemtype) {
 
-                    case constants::TYPE_PAGE:
-                        $this->setDefault(constants::TEXTINSTRUCTIONS,
-                            '');
-                        break;
-
-                    case constants::TYPE_LISTENREPEAT:
-                        $this->setDefault(constants::TEXTINSTRUCTIONS,
-                                get_string('lr_instructions1', constants::M_COMPONENT));
-                        break;
-                    case constants::TYPE_DICTATIONCHAT:
-                        $this->setDefault(constants::TEXTINSTRUCTIONS,
-                                get_string('dc_instructions1', constants::M_COMPONENT));
-                        break;
-                    case constants::TYPE_SPEECHCARDS:
-                        $this->setDefault(constants::TEXTINSTRUCTIONS,
-                                get_string('sc_instructions1', constants::M_COMPONENT));
-                        break;
-                     case constants::TYPE_DICTATION:
-                         $this->setDefault(constants::TEXTINSTRUCTIONS,
-                                 get_string('dictation_instructions1', constants::M_COMPONENT));
-                         break;
-
-                     case constants::TYPE_MULTIAUDIO:
-                         $this->setDefault(constants::TEXTINSTRUCTIONS,
-                             get_string('multiaudio_instructions1', constants::M_COMPONENT));
-                         break;
-
-                    case constants::TYPE_MULTICHOICE:
-                        $this->setDefault(constants::TEXTINSTRUCTIONS,
-                            get_string('multichoice_instructions1', constants::M_COMPONENT));
-                        break;
-
-                    case constants::TYPE_SHORTANSWER:
-                        $this->setDefault(constants::TEXTINSTRUCTIONS,
-                            get_string('shortanswer_instructions1', constants::M_COMPONENT));
-                        break;
-
-                    case constants::TYPE_SMARTFRAME:
-                        $this->setDefault(constants::TEXTINSTRUCTIONS,
-                            get_string('smartframe_instructions1', constants::M_COMPONENT));
-                        break;
-                    //listening gapfill
-                    case constants::TYPE_LGAPFILL:
-                        $this->setDefault(constants::TEXTINSTRUCTIONS,
-                            get_string('lg_instructions1', constants::M_COMPONENT));
-                        break;
-                    //typing gapfill
-                    case constants::TYPE_TGAPFILL:
-                        $this->setDefault(constants::TEXTINSTRUCTIONS,
-                            get_string('tg_instructions1', constants::M_COMPONENT));
-                        break;
-                    //speaking gapfill
-                    case constants::TYPE_SGAPFILL:
-                        $this->setDefault(constants::TEXTINSTRUCTIONS,
-                            get_string('sg_instructions1', constants::M_COMPONENT));
-                        break;
-
-                    //comprehension quiz
-                    case constants::TYPE_COMPQUIZ:
-                        $this->setDefault(constants::TEXTINSTRUCTIONS,
-                            get_string('listeningquiz_instructions1', constants::M_COMPONENT));
-                        break;
-
-                    //button quiz
-                    case constants::TYPE_BUTTONQUIZ:
-                        $this->setDefault(constants::TEXTINSTRUCTIONS,
-                            get_string('buttonquiz_instructions1', constants::M_COMPONENT));
-                        break;
-                }
+                //set default instructions
+                 $this->setDefault(constants::TEXTINSTRUCTIONS,
+                     get_string($this->itemtype . '_instructions1', constants::M_COMPONENT));
 
                 //tts options
                 $langoptions = utils::get_lang_options();

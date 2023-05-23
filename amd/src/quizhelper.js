@@ -174,6 +174,10 @@ define(['jquery', 'core/log', 'qtype_minispeak/definitions', 'core/templates', '
         //post grade
          // log.debug("reporting step grade");
         dd.report_step_grade(stepdata);
+
+        //in single mode do no do_next
+        if(currentitem.singlemode===true){return;}
+
          // log.debug("reported step grade");
         //hide current question
         var theoldquestion = $("#" + currentitem.uniqueid + "_container");

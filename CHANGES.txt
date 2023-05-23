@@ -1,0 +1,4 @@
+Change List
+=========
+Version 1.0.16 (Build 2023052300)
+- Added webservice for report step grade and compare_passage_to_transcript and check_by_phonetic

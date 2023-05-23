@@ -12,6 +12,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+import {get_string as getString} from 'core/str';
+import {prefetchStrings} from 'core/prefetch';
 /**
  * Mini Speak Type Choose
  *
@@ -25,6 +27,7 @@ const Selectors = {
     fields: {
         selector: '[data-itemtypechooser-field="selector"]',
         updateButton: '[data-itemtypechooser-field="updateButton"]',
+        typeInstructions: '[data-itemtypechooser-field="typeInstructions"]'
     },
 };
 
@@ -32,15 +35,41 @@ const Selectors = {
  * Initialise the format chooser.
  */
 export const init = () => {
+
+    prefetchStrings('qtype_minispeak', [
+        'multiaudio_instructions1',
+        'multichoice_instructions1',
+        'shortaudio_instructions1',
+        'smartframe_instructions1',
+        'listenrepeat_instructions1',
+        'dictation_instructions1',
+        'dictationchat_instructions1',
+        'speakinggapfill_instructions1',
+        'typinggapfill_instructions1',
+        'listeninggapfill_instructions1',
+        'comprehensionquiz_instructions1',
+        'buttonquiz_instructions1',
+        'page_instructions1'
+
+    ]);
+
     document.querySelector(Selectors.fields.selector).addEventListener('change', e => {
         const form = e.target.closest('form');
         const updateButton = form.querySelector(Selectors.fields.updateButton);
+        const typeInstructions = form.querySelector(Selectors.fields.typeInstructions);
         const fieldset = updateButton.closest('fieldset');
 
+        //set the form to update
         const url = new URL(form.action);
         url.hash = fieldset.id;
-
         form.action = url.toString();
-        updateButton.click();
+
+        // Set the instructions for the selected type.
+        getString(e.target.value +'_instructions1', 'qtype_minispeak')
+            .then(function(theinstructions){
+                typeInstructions.value=theinstructions;
+                updateButton.click();
+            }
+        );
     });
 };

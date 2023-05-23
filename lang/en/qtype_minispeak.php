@@ -442,15 +442,12 @@ $string['start'] = 'Start';
 $string['nextlessonitem'] = 'Next Page';
 $string['loading'] = 'Loading...';
 $string['dictation_instructions1'] = 'Listen and type each sentence that you hear.';
-$string['sc_instructions1'] = 'Read the phrase on each card aloud.';
-$string['dc_instructions1'] = 'Listen and type the sentences you hear.';
-//$string['dc_instructions2'] = 'Click \'Start\' to begin!';
+$string['dictationchat_instructions1'] = 'Listen and type the sentences you hear.';
 //dictation
-$string['d_question'] = 'Item';
+$string['dictation_question'] = 'Item';
 //listen and repeat
 $string['listenandrepeat'] = 'Listen and Speak';
-$string['lr_instructions1'] = 'Listen and respond to the sentences you hear.';
-//$string['lr_instructions2'] = 'Click \'Start\' to begin!';
+$string['listenrepeat_instructions1'] = 'Listen and respond to the sentences you hear.';
 
 $string['choosevoice'] = "Choose the prompt speaker's voice";
 $string['choosemultiaudiovoice'] = "Choose the answer reader's voice";
@@ -638,12 +635,12 @@ $string['typinggapfill'] = 'Typing GapFill';
 $string['comprehensionquiz'] = 'Comprehension Quiz';
 $string['compquiz'] = 'Comprehension Quiz';
 $string['buttonquiz'] = 'Button Quiz';
-$string['lg_instructions1'] = 'Listening GapFill instructions';
-$string['sg_instructions1'] = 'Speaking GapFill instructions';
-$string['tg_instructions1'] = 'Typing GapFill instructions';
+$string['listeninggapfill_instructions1'] = 'Listen and fill in the blanks';
+$string['speakinggapfill_instructions1'] = 'Say the full sentence aloud';
+$string['typinggapfill_instructions1'] = 'Fill in the blanks';
 $string['compquiz_results'] = 'Results';
 $string['buttonquiz_results'] = 'Results';
-$string['compquiz_instructions1'] = 'Comprehension Quiz instructions';
+$string['comprehensionquiz_instructions1'] = 'Comprehension Quiz instructions';
 $string['buttonquiz_instructions1'] = 'Button Quiz instructions';
 $string['iteminstructions'] = 'Item instructions';
 $string['modaleditform'] = 'Item Edit Form';

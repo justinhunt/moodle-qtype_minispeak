@@ -207,7 +207,7 @@ abstract class item implements templatable, renderable {
         $itemtext =  file_rewrite_pluginfile_urls($itemrecord->{constants::TEXTQUESTION},
             'pluginfile.php', $this->context->id,constants::M_COMPONENT,
             constants::TEXTQUESTION_FILEAREA, $testitem->id);
-  //      $itemtext = format_text($itemtext, FORMAT_MOODLE, $editoroptions);
+        $itemtext = format_text($itemtext, FORMAT_MOODLE, $editoroptions);
         if(!empty($itemtext)) {
             $testitem->itemtext = $itemtext;
         }

@@ -130,12 +130,61 @@ class qtype_minispeak_edit_form extends question_edit_form {
     protected function data_preprocessing($question) {
         $question = parent::data_preprocessing($question);
 
-        //Set qresource details, and configure a draft area to accept any uploaded pictures
-        //all this and this whole method does, is to load existing files into a filearea
-        //so it is not called when creating a new question, only when editing an existing one
+        
+        //Setup our checkbox group initial values 
+        //make sure the media upload fields are in the correct state
+        $fs = get_file_storage();
+        if(isset($question->id)) {
+            $files = $fs->get_area_files($this->context->id, constants::M_COMPONENT, constants::MEDIAQUESTION, $question->id);
+            if ($files) {
+                $question->addmedia = 1;
+            } else {
+                $question->addmedia = 0;
+            }
+        }
 
-        //best to use file_get_submitted_draft_itemid - because copying questions gets weird otherwise
-        //$draftitemid =$question->options->qresource;
+        if(!empty($question->{constants::TTSQUESTION})){
+            $question->addttsaudio = 1;
+        }else{
+            $question->addttsaudio = 0;
+        }
+        if(!empty($question->{constants::MEDIAIFRAME})){
+            $question->addiframe = 1;
+        }else{
+            $question->addiframe = 0;
+        }
+        if(!empty($question->{constants::YTVIDEOID})){
+            $question->addyoutubeclip = 1;
+        }else{
+            $question->addyoutubeclip = 0;
+        }
+        if(!empty($question->{constants::QUESTIONTEXTAREA})){
+            $edoptions = constants::ITEMTEXTAREA_EDOPTIONS;
+            $edoptions['context']=$this->context;
+            $question->{constants::QUESTIONTEXTAREA. 'format'}=FORMAT_HTML;
+            $data = file_prepare_standard_editor($data, constants::QUESTIONTEXTAREA, $edoptions, $this->context, constants::M_COMPONENT,
+                constants::TEXTQUESTION_FILEAREA, $question->itemid);
+            $question->addtextarea = 1;
+        }else{
+            $question->addtextarea = 0;
+        }
+        if(!empty($question->{constants::TTSDIALOG})){
+            $question->addttsdialog = 1;
+            //expand opts
+            $data=utils::unpack_ttsdialogopts($data);
+        }else{
+            $question->addttsdialog = 0;
+        }
+        if(!empty($question->{constants::TTSPASSAGE})){
+            $question->addttspassage = 1;
+            //expand opts
+            $question=utils::unpack_ttspassageopts($question);
+        }else{
+            $question->addttspassage = 0;
+        }
+
+
+        //Setup File Areas
         foreach(constants::M_FILE_AREAS as $filearea){
             $draftitemid = file_get_submitted_draft_itemid($filearea);
 

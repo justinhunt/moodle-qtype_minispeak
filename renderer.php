@@ -47,7 +47,9 @@ class qtype_minispeak_renderer extends qtype_with_combined_feedback_renderer {
       //  $response = $question->get_response($qa);
         $context = context::instance_by_id($question->contextid);
         $itemdata = utils::fetch_data_for_js($question, $context, $qa);
-        $itemdata->preview=true;
+
+        //this will tell it to not do NEXT screen (ie to just finish)
+        $itemdata->singlemode=true;
 
 
         $itemshtml=[];
@@ -58,7 +60,10 @@ class qtype_minispeak_renderer extends qtype_with_combined_feedback_renderer {
 
         $question_js= utils::fetch_item_amd($itemdata,$question);
 
-        $ret =$question_html . $question_js;
+        $ret = html_writer::tag('div', $question->format_questiontext($qa),
+            array('class' => 'qtext'));
+
+        $ret .=$question_html . $question_js;
         return $ret;
 
 
