@@ -74,10 +74,12 @@ class restore_qtype_minispeak_plugin extends restore_qtype_plugin {
 
             // It is possible for old backup files to contain unique key violations.
             // We need to check to avoid that.
+
             if (!$DB->record_exists('qtype_minispeak_options', array('questionid' => $data->questionid))) {
                 $newitemid = $DB->insert_record('qtype_minispeak_options', $data);
                 $this->set_mapping('qtype_minispeak_options', $oldid, $newitemid);
             }
+
         }
     }
 
@@ -150,6 +152,7 @@ class restore_qtype_minispeak_plugin extends restore_qtype_plugin {
     /**
      * Return the contents of this qtype to be processed by the links decoder
      */
+    /*
     public static function define_decode_contents() {
 
         $contents = array();
@@ -160,4 +163,5 @@ class restore_qtype_minispeak_plugin extends restore_qtype_plugin {
 
         return $contents;
     }
+    */
 }
