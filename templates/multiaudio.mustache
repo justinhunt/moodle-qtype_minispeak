@@ -1,6 +1,10 @@
 {{> qtype_minispeak/questionheader}}
+{{#locked}}
+  {{>qtype_minispeak/answercard}}
+{{/locked}}
+{{^locked}}
     {{#sentences}}
-        <div class="row mcplayrow" id="{{uniqueid}}_option{{indexplusone}}">
+        <div class="row mcplayrow no-gutters" id="{{uniqueid}}_option{{indexplusone}}">
             <div class="col-md-1 mcaudioplayer_{{indexplusone}}">
                 <div class="mc_playbutton_container">
                     <button class="minispeak_mc_audioplayer mcplaytrigger btn btn-secondary" type="button" data-index="{{index}}" id="{{uniqueid}}_audioplayer{{indexplusone}}">
@@ -21,5 +25,5 @@
     {{/sentences}}
 
     {{> qtype_minispeak/ttrecorder}}
-
+{{/locked}}
 {{> qtype_minispeak/questionfooter}}

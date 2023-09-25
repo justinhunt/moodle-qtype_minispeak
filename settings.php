@@ -111,7 +111,7 @@ if ($ADMIN->fulltree) {
     $name = 'animations';
     $label = get_string($name, constants::M_COMPONENT);
     $details = get_string($name . '_details', constants::M_COMPONENT);
-    $default = constants::M_ANIM_FANCY ;
+    $default = constants::M_ANIM_PLAIN ;
     $options = utils::fetch_options_animations();
     $settings->add(new admin_setting_configselect(constants::M_COMPONENT . "/$name",
         $label, $details, $default, $options));

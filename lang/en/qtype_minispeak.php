@@ -340,6 +340,7 @@ $string['audioitemfile'] = 'item Audio(MP3)';
 $string['itemname'] = 'Item Name';
 $string['itemorder'] = 'Item Order';
 $string['correct'] = 'Correct';
+$string['incorrect'] = 'Incorrect';
 $string['itemtype'] = 'Item Type';
 $string['actions'] = 'Actions';
 $string['edititem'] = 'Edit item';
@@ -604,7 +605,7 @@ $string['reporttablepaged'] = "Paged Tables";
 $string['anim_fancy'] = "Fancy animation";
 $string['anim_plain'] = "Plain animation";
 $string['animations'] = "Animations";
-$string['animations_details'] = "Transitions between item subtypes are animated. If fancy animation causes trouble, choose plain.";
+$string['animations_details'] = "Transitions between items in question are sometimes animated. For now, always choose plain.";
 $string['confirmchoice_formlabel'] = "Must attempt (no skip)";
 $string['continue'] = "Continue <i class='fa fa-arrow-right'></i>";
 $string['confirmchoice'] = "Check";
@@ -642,6 +643,9 @@ $string['compquiz_results'] = 'Results';
 $string['buttonquiz_results'] = 'Results';
 $string['comprehensionquiz_instructions1'] = 'Comprehension Quiz instructions';
 $string['buttonquiz_instructions1'] = 'Button Quiz instructions';
+$string['page_instructions1'] = 'Check the content below, then continue to the next question.';
+$string['speechcards_instructions1'] = 'Read the text on each card aloud.';
+
 $string['iteminstructions'] = 'Item instructions';
 $string['modaleditform'] = 'Item Edit Form';
 $string['modaleditform_details'] = 'Adding or editing items in the Minispeak can be done via a modal(popup) form or on a new page';
@@ -655,3 +659,12 @@ $string['readsentences_desc'] = 'If checked each sentence will be read aloud. It
 $string['allowretry'] = 'Allow retry';
 $string['allowretry_desc'] = 'If checked allows students to submit new attempts, if their previous response was not correct.';
 
+$string['fullycompleted'] = 'Successfully completed';
+$string['partialcompleted'] = 'Partially completed';
+$string['pleaseselectananswer'] = 'Please select answer';
+$string['completed'] = 'Completed';
+$string['nonattempted'] = 'Not attempted';
+
+$string['correctanswer'] = 'Your answer was correct';
+$string['incorrectanswer'] = 'Your answer was incorrect';
+$string['correctansweris'] = 'Correct answer : {$a}';

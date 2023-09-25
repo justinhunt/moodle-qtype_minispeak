@@ -1767,8 +1767,8 @@ div.qtype_minispeak_feedback_cont.qtype_minispeak_postattempt {
     text-align: center;
     width: 100%;
     height: 100%;
-    max-width: 400px;
-    max-height: 225px;
+    max-width: 560px;
+    max-height: 315px;
 }
 
 .qtype_minispeak_iframe_responsive iframe {
@@ -1777,8 +1777,8 @@ div.qtype_minispeak_feedback_cont.qtype_minispeak_postattempt {
     height:100%;
     width:100%;
     position: absolute;
-    max-width: 400px;
-    max-height: 225px;
+    max-width: 560px;
+    max-height: 315px;
 }
 
 .minispeak_actionbutton {
@@ -2057,8 +2057,8 @@ span.qtype_minispeak_finishedanswer {
     margin-bottom: 3px;
     margin-top: 3px;
 }
-.gapfill-container input.single-character,
-.gapfill-container input.single-character-mtext {
+.gapfill-container input.single-character[maxlength="1"],
+.gapfill-container input.single-character-mtext[maxlength="1"] {
     width: 26px;
     margin-left: 2px;
     text-align: center;
@@ -2598,4 +2598,57 @@ span.qtype_minispeak_finishedanswer {
 .minispeak_sgapfill_player_box  .sgapfill_skip_btn {
     position: absolute;
     right: 10px;
+}
+/* the background color of gapfill words char inputs when marked correct */
+.ms_gapfill_char_correct {
+    background-color: palegreen;
+}
+
+.minispeak_questioncontainer {
+    position: relative;
+}
+
+.minispeak_questioncontainer [data-display] {
+    display: none;
+}
+
+.minispeak_questioncontainer [data-display="show"] {
+    display: initial;
+}
+
+.minispeak_questioncontainer .minispeak_question_statuscard {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    padding: 2rem;
+    background-color: #d9ebd4;
+    text-align: center;
+}
+
+.minispeak_questioncontainer .qtype_minispeak_typenicename {
+    text-align: left;
+}
+
+.minispeak_questioncontainer .qtype_minispeak_retrybutton button {
+    box-sizing: border-box;
+    border-radius: 0;
+    margin: 0;
+    -webkit-appearance: button;
+    cursor: pointer;
+    background-color: #cfe2f2;
+    border-width: 0;
+    padding: 0.5rem 1rem;
+}
+
+.minispeak_questioncontainer .minispeakresponse {
+    display: inline-block;
+    background-color: #f3e14782;
+}
+
+.minispeak_questioncontainer span.masked-answer {
+    background-color: #b1c7b1;
+    letter-spacing: 0.05rem;
+    padding: 0 0.1rem;
 }

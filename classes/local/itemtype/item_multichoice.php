@@ -33,6 +33,9 @@ class item_multichoice extends item {
     //the item type
     public const ITEMTYPE = constants::TYPE_MULTICHOICE;
 
+    /** @var bool $hassubitems indicates whether subitems or single item */
+    protected $hassubitems = false;
+
     /**
      * Export the data for the mustache template.
      *

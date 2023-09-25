@@ -15,6 +15,9 @@ define(['jquery',
   log.debug('minispeak ShortAnswer: initialising');
 
   return {
+
+    answers: {},
+
     passmark: 90,//lower this if it often doesnt match (was 85)
 
     //for making multiple instances
@@ -40,7 +43,8 @@ define(['jquery',
       stepdata.totalitems = 1;
       stepdata.correctitems = percent>0?1:0;
       stepdata.grade = percent;
-      self.quizhelper.do_next(stepdata);
+      stepdata.answers = self.answers;
+      self.quizhelper.do_next(stepdata, true);
     },
 
     /* NOT NEEDED */
@@ -52,34 +56,34 @@ define(['jquery',
         });
       });
     },
-    
+
     register_events: function(index, itemdata, quizhelper) {
-      
+
       var self = this;
       self.index = index;
       self.quizhelper = quizhelper;
-      
+
       $("#" + itemdata.uniqueid + "_container .minispeak_nextbutton").on('click', function(e) {
         self.next_question(0);
       });
-      
+
       $("#" + itemdata.uniqueid + "_container ." + itemdata.uniqueid + "_option").on('click', function(e) {
-        
+
         $("." + itemdata.uniqueid + "_option").prop("disabled", true);
         $("." + itemdata.uniqueid + "_fb").html("<i style='color:red;' class='fa fa-times'></i>");
         $("." + itemdata.uniqueid + "_option" + itemdata.correctanswer + "_fb").html("<i style='color:green;' class='fa fa-check'></i>");
-        
+
         var checked = $('input[name='+itemdata.uniqueid+'_options]:checked').data('index');
         var percent = checked == itemdata.correctanswer ? 100 : 0;
-        
+
         $(".minispeak_nextbutton").prop("disabled", true);
         setTimeout(function() {
           $(".minispeak_nextbutton").prop("disabled", false);
           self.next_question(percent);
         }, 2000);
-        
+
       });
-      
+
     },
 
     init_components: function(index, itemdata, quizhelper) {
@@ -160,6 +164,11 @@ define(['jquery',
                   }
                 }
               }
+
+            app.answers[0] = {
+              answer: spoken,
+              correct: Boolean(matched)
+            };
 
               //if we got a match then process it
             if(matched){

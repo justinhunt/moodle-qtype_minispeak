@@ -17,6 +17,8 @@ define(['jquery',
 
   return {
 
+    answers: {},
+
       //for making multiple instances
       clone: function () {
           return $.extend(true, {}, this);
@@ -70,14 +72,15 @@ define(['jquery',
           app.controls.next_button = $("#" + itemdata.uniqueid + "_container .minispeak-speechcards_nextbutton");
           app.controls.slider = $("#" + itemdata.uniqueid + "_container .minispeak_speechcards_target_phrase");
         },
-        next_question: function() {
+        next_question: function(showSummary) {
           var stepdata = {};
           stepdata.index = index;
           stepdata.hasgrade = true;
           stepdata.totalitems = app.terms.length;
           stepdata.correctitems = app.results.filter(function(e){return e.points>0;}).length;
           stepdata.grade = Math.round((stepdata.correctitems/stepdata.totalitems)*100);
-          quizhelper.do_next(stepdata);
+          stepdata.answers = self.answers;
+          quizhelper.do_next(stepdata, showSummary);
         },
         register_events: function() {
 
@@ -280,7 +283,7 @@ log.debug('correct:',correct_clean);
         },
 
         do_end: function() {
-          app.next_question();
+          app.next_question(true);
         },
 
         is_end: function() {

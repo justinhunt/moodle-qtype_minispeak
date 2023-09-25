@@ -22,7 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace qtype_minispeak;
- 
+
 defined('MOODLE_INTERNAL') || die();
 
 use \qtype_minispeak\constants;
@@ -209,7 +209,7 @@ class utils{
         }
     }
 
-  
+
 
     public static function update_step_grade($cmid,$stepdata){
 
@@ -1301,6 +1301,7 @@ class utils{
         //add our item to test
         $renderer=$OUTPUT;
         $itemdata=$theitem->export_for_template($renderer);
+        $itemdata->questiontype = $theitem;
         return $itemdata;
     }
 
@@ -1368,7 +1369,9 @@ class utils{
         $ret_html = $ret_html . $opts_html;
         //TO DO we fudge a cmid and its not really needed
         $opts=array('cmid'=>$question->id,'widgetid'=>$widgetid);
-        $PAGE->requires->js_call_amd("qtype_minispeak/activitycontroller", 'init', array($opts));
+        if (empty($itemdata->locked)) {
+            $PAGE->requires->js_call_amd("qtype_minispeak/activitycontroller", 'init', array($opts));
+        }
 
 
         //these need to be returned and echo'ed to the page
@@ -1400,6 +1403,19 @@ class utils{
     {
         $maxbytes = 0;
         return array('subdirs' => true, 'maxfiles' => $maxfiles, 'maxbytes' => $maxbytes, 'accepted_types' => array('audio', 'video','image'));
+    }
+
+    public static function decode_payload($payload, $secret) {
+        if (empty($payload) || empty($secret)) {
+            return null;
+        }
+        try {
+            $payload = JWT::decode($payload, $secret, ['HS256']);
+            $payload = base64_decode($payload);
+            return json_decode($payload, true);
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 
 }

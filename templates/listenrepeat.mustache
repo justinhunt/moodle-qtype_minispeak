@@ -1,4 +1,8 @@
 {{> qtype_minispeak/questionheader}}
+{{#locked}}
+  {{>qtype_minispeak/answercard}}
+{{/locked}}
+{{^locked}}
   <div class="minispeak_landr_player_box">
     <div style="display:none;" class="landr_results">{{#str}}dc_results, qtype_minispeak{{/str}}</div>
 
@@ -35,5 +39,5 @@
     </div>
 
   </div>
-
+{{/locked}}
 {{> qtype_minispeak/questionfooter}}

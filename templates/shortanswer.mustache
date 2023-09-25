@@ -1,6 +1,10 @@
 {{> qtype_minispeak/questionheader}}
+{{#locked}}
+  {{>qtype_minispeak/answercard}}
+{{/locked}}
+{{^locked}}
 
 <div id="{{uniqueid}}_correctanswer" class="qtype_minispeak_spokenandcorrect {{rtl}}" > ---- </div>
 {{> qtype_minispeak/ttrecorder}}
-
+{{/locked}}
 {{> qtype_minispeak/questionfooter}}

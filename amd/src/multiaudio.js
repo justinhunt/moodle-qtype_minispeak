@@ -16,6 +16,8 @@ define(['jquery',
 
   return {
 
+      answers: {},
+
       passmark: 90,//lower this if it often doesnt match (was 85)
       playing: false,
 
@@ -43,19 +45,20 @@ define(['jquery',
       stepdata.totalitems = 1;
       stepdata.correctitems = percent>0?1:0;
       stepdata.grade = percent;
-      self.quizhelper.do_next(stepdata);
+      stepdata.answers = self.answers;
+      self.quizhelper.do_next(stepdata, true);
     },
     register_events: function(index, itemdata, quizhelper) {
-      
+
       var self = this;
       var theplayer = $("#" + itemdata.uniqueid + "_player");
       self.index = index;
       self.quizhelper = quizhelper;
-      
+
       $("#" + itemdata.uniqueid + "_container .minispeak_nextbutton").on('click', function(e) {
         self.next_question(0);
       });
-      
+
       $("#" + itemdata.uniqueid + "_container .mcplayrow").on('click', function(e) {
         //if disabled =>just return (already answered)
           if($("#" + itemdata.uniqueid + "_container .mcplayrow").hasClass('minispeak_mc_disabled')){
@@ -84,7 +87,7 @@ define(['jquery',
           //var checked = $(this).data('index');
 
       });
-      
+
     },//end of register events
 
     prepare_audio: function(itemdata) {
@@ -120,6 +123,11 @@ define(['jquery',
 
 
         var percent = checked == itemdata.correctanswer ? 100 : 0;
+
+        this.answers[0] = {
+            answer: checked,
+            correct: checked == itemdata.correctanswer
+        };
 
         return percent;
 

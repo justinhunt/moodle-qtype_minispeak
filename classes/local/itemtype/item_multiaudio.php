@@ -33,6 +33,8 @@ class item_multiaudio extends item {
     //the item type
     public const ITEMTYPE = constants::TYPE_MULTIAUDIO;
 
+    /** @var bool $hassubitems indicates whether subitems or single item */
+    protected $hassubitems = false;
 
     /**
      * The class constructor.

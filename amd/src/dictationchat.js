@@ -11,6 +11,8 @@ define(['jquery',
 
   return {
 
+      answers: {},
+
       //for making multiple instances
       clone: function () {
           return $.extend(true, {}, this);
@@ -34,7 +36,7 @@ define(['jquery',
         self.getItems();
 
     },
-    next_question:function(){
+    next_question:function(showSummary){
       var self=this;
       var stepdata = {};
       stepdata.index = self.index;
@@ -42,7 +44,14 @@ define(['jquery',
       stepdata.totalitems=self.items.length;
       stepdata.correctitems=self.items.filter(function(e) {return e.correct;}).length;
       stepdata.grade = Math.round((stepdata.correctitems/stepdata.totalitems)*100);
-      self.quizhelper.do_next(stepdata);
+      stepdata.answers = self.items.reduce(function(answers, item, index) {
+        if (!answers[index]) {
+          answers[index] = {};
+        }
+        answers[index].correct = Boolean(item.correct);
+        return answers;
+      }, self.answers);
+      self.quizhelper.do_next(stepdata, showSummary);
     },
 
     register_events: function() {
@@ -90,7 +99,7 @@ define(['jquery',
           }
       });
 
-      
+
       $("#" + self.itemdata.uniqueid + "_container .dictate_check_btn").on("click", function() {
         self.check_answer();
       });
@@ -127,7 +136,7 @@ define(['jquery',
           }
         }
       });
-      
+
     },
 
     game: {
@@ -145,6 +154,10 @@ define(['jquery',
           transcript += $(this).text();
         }
       });
+
+      self.answers[self.game.pointer] = {
+        answer: transcript,
+      };
 
     //the old code looped over dictate_targetWord, pushed to transcriptArray, and joined with a space
     //But that did not account for words split by punc, eg It's.
@@ -310,7 +323,7 @@ define(['jquery',
       $(".minispeak_nextbutton").prop("disabled",true);
       setTimeout(function() {
         $(".minispeak_nextbutton").prop("disabled",false);
-        self.next_question();
+        self.next_question(true);
       }, 2200);
     },
 
@@ -325,6 +338,7 @@ define(['jquery',
         item.answered = false;
         item.correct = false;
       });
+      self.answers = {};
 
       self.game.pointer = 0;
 

@@ -16,10 +16,12 @@
 
 namespace qtype_minispeak\local\itemtype;
 
+use html_writer;
 use qtype_minispeak\constants;
 use qtype_minispeak\utils;
 use templatable;
 use renderable;
+use stdClass;
 
 /**
  * Renderable class for an item in a minispeak question type.
@@ -69,6 +71,9 @@ abstract class item implements templatable, renderable {
 
     //NEEDS SPEECH REC
     protected $needs_speechrec  =false;
+
+    /** @var bool $hassubitems indicates whether subitems or single item */
+    protected $hassubitems = true;
 
     /**
      * The class constructor.
@@ -156,6 +161,7 @@ abstract class item implements templatable, renderable {
 
     public function set_questionattempt($questionattempt){
         $this->questionattempt = $questionattempt;
+        $this->set_currentnumber($questionattempt->get_slot());
     }
 
     public function set_token($token){
@@ -197,6 +203,9 @@ abstract class item implements templatable, renderable {
         $testitem->timelimit=$this->itemrecord->timelimit;
         if($this->forcetitles){$testitem->title=$this->itemrecord->name;}
         $testitem->uniqueid=$this->itemrecord->type . $testitem->number;
+        $testitem->typenicename = utils::fetch_itemtypes_list()[$testitem->type] ?? null;
+        $testitem->allowretry = true;
+        $testitem->hassubitems = !empty($this->hassubitems);
 
         //Question instructions
         if(!empty($itemrecord->{constants::TEXTINSTRUCTIONS})) {
@@ -1042,5 +1051,133 @@ abstract class item implements templatable, renderable {
         }
         $this->itemrecord->phonetic= $thephonetics;
         return $thephonetics;
+    }
+
+    /**
+     * @param array $payloadJson
+     * @param object $templateContext
+     * @return void
+     */
+    public function export_for_answers($payloadJson, $templateContext) {
+        $answerContext = new stdClass;
+        $objclass = get_class($this);
+        if (!empty($templateContext->hassubitems)) {
+            for($i = 0; $i < count($templateContext->sentences); $i++) {
+                $answerContext->answers[$i] = (object) ['correct' => false, 'index' => $i + 1];
+                switch($objclass) {
+                    case item_dictation::class:
+                    case item_dictationchat::class:
+                    case item_listenrepeat::class:
+                    case item_speechcards::class:
+                        $answerContext->answers[$i]->correctAnswer = $templateContext->sentences[$i]->sentence;
+                        break;
+                    case item_typinggapfill::class:
+                    case item_listeninggapfill::class:
+                    case item_speakinggapfill::class:
+                        $maskstart = false;
+                        $answerContext->answers[$i]->correctAnswer = '';
+                        foreach ($templateContext->sentences[$i]->parsedstring as $charindex => $char) {
+                            $char = (object) $char;
+                            if ($char->type == 'text') {
+                                if ($maskstart && empty($maskstart = false)) {
+                                    $answerContext->answers[$i]->correctAnswer .= html_writer::end_span();
+                                }
+                                $answerContext->answers[$i]->correctAnswer .= $char->character;
+                            } elseif ($char->type == 'mtext') {
+                                $maskstart = true;
+                                $answerContext->answers[$i]->correctAnswer .= $char->character;
+                                $answerContext->answers[$i]->correctAnswer .= html_writer::start_span('masked-answer');
+                            } elseif ($char->type == 'input') {
+                                $answerContext->answers[$i]->correctAnswer .= html_writer::span($char->character);
+                            }
+                        }
+                        if ($maskstart) {
+                            $answerContext->answers[$i]->correctAnswer .= html_writer::end_span();
+                        }
+                        break;
+                }
+            }
+        } else {
+            switch($objclass) {
+                case item_shortanswer::class:
+                    $answerContext->correctAnswer = join(', ', array_column($templateContext->sentences, 'sentence'));
+                    break;
+                case item_multichoice::class:
+                case item_multiaudio::class:
+                    $answerContext->choicetype = true;
+                    foreach ($templateContext->sentences as $sentence) {
+                        if ($sentence->indexplusone == $templateContext->correctanswer) {
+                            $answerContext->correctAnswer = $sentence->sentence;
+                        }
+                    }
+                    break;
+
+            }
+            if (empty($payloadJson['answers'])) {
+                $answerContext->answers[0] = (object) ['correct' => false];
+            }
+        }
+        if (!empty($payloadJson['answers'])) {
+            foreach ($payloadJson['answers'] as $i => $answer) {
+                $answerObj = (object) $answer;
+                if (isset($answerContext->answers) && empty($answerContext->answers[$i])) {
+                    continue;
+                }
+                if (!isset($answerContext->answers)) {
+                    $answerContext->answers[$i] = (object) [
+                        'givenAnswer' => $answer->answer,
+                        'index' => $i + 1,
+                    ];
+                }
+                $updateObj = $answerContext->answers[$i];
+                $updateObj->correct = $answerObj->correct;
+                switch($objclass) {
+                    case item_dictation::class:
+                    case item_dictationchat::class:
+                        if (isset($answerObj->answer) && $answerObj->answer !== '') {
+                            $updateObj->givenAnswer = $answerObj->answer;
+                        }
+                        break;
+                    case item_multichoice::class:
+                    case item_multiaudio::class:
+                        $updateObj->choices = [];
+                        foreach ($templateContext->sentences as $sentence) {
+                            $option = ['text' => $sentence->sentence,];
+                            $option['selected'] = $sentence->indexplusone == $answerObj->answer;
+                            $updateObj->choices[] = $option;
+                        }
+                        break;
+                    case item_typinggapfill::class:
+                    case item_listeninggapfill::class:
+                        if (!empty($answerObj->answer) && is_array($answerObj->answer)) {
+                            $updateObj->givenAnswer = '';
+                            $maskstart = false;
+                            $answers = array_column($answerObj->answer, 'value', 'index');
+                            foreach ($templateContext->sentences[$i]->parsedstring as $charindex => $char) {
+                                $char = (object) $char;
+                                if ($char->type == 'text') {
+                                    if ($maskstart && empty($maskstart = false)) {
+                                        $updateObj->givenAnswer .= html_writer::end_span();
+                                    }
+                                    $updateObj->givenAnswer .= $char->character;
+                                } elseif ($char->type == 'mtext') {
+                                    $maskstart = true;
+                                    $updateObj->givenAnswer .= $char->character;
+                                    $updateObj->givenAnswer .= html_writer::start_span('masked-answer');
+                                } elseif ($char->type == 'input') {
+                                    $updateObj->givenAnswer .= html_writer::span(
+                                        isset($answers[$charindex]) ? $answers[$charindex] : null
+                                    );
+                                }
+                            }
+                            if ($maskstart) {
+                                $updateObj->givenAnswer .= html_writer::end_span();
+                            }
+                        }
+                        break;
+                }
+            }
+        }
+        $templateContext->answerContext = $answerContext;
     }
 }

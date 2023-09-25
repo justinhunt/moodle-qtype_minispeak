@@ -1,6 +1,10 @@
 {{> qtype_minispeak/questionheader}}
+{{#locked}}
+  {{>qtype_minispeak/answercard}}
+{{/locked}}
+{{^locked}}
 {{#sentences}}
-  <div class="row dictationrow">
+  <div class="row dictationrow no-gutters">
     <div class="col-md-1 poodlldictationplayer dictationplayer_{{index}}">
       <button class="dictationtrigger btn btn-secondary" type="button" data-src="@AUDIO@"><i class="fa fa-play"></i></button>
     </div>
@@ -15,4 +19,5 @@
     </div>
   </div>
   {{/sentences}}
+{{/locked}}
 {{> qtype_minispeak/questionfooter}}

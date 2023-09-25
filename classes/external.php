@@ -19,6 +19,7 @@ use qtype_minispeak\local\itemtype\item;
 use external_api;
 use external_function_parameters;
 use external_value;
+use qtype_minispeak\JWT;
 
 /**
  * External class.
@@ -99,17 +100,43 @@ class qtype_minispeak_external extends external_api {
     public static function report_step_grade_parameters() {
         return new external_function_parameters([
                 'cmid' => new external_value(PARAM_INT),
-                'step' => new external_value(PARAM_TEXT)
+                'qubaid' => new external_value(PARAM_SEQUENCE),
+                'step' => new external_value(PARAM_TEXT),
+                'store' => new external_value(PARAM_BOOL)
         ]);
     }
 
-    public static function report_step_grade($cmid,$step){
-        $stepdata = json_decode($step);
-        list($success,$message,$returndata)= utils::update_step_grade($cmid,$stepdata);
-        return $success;
+    public static function report_step_grade($cmid, $qubaid, $step, $store) {
+        global $CFG;
+        require_once($CFG->dirroot . '/question/engine/lib.php');
+        $params = self::validate_parameters(self::report_step_grade_parameters(), [
+            'cmid' => $cmid, 'qubaid' => $qubaid, 'step' => $step, 'store' => $store,
+        ]);
+        list($qubaid, $slot) = explode(',', $params['qubaid']);
+
+        if (!empty($qubaid) && !empty($slot)) {
+            $quba = question_engine::load_questions_usage_by_activity($qubaid);
+            $qa = $quba->get_question_attempt($slot);
+            if ($secret = $qa->get_last_qt_var(constants::TOKENKEYPRIVATE)) {
+                $token = JWT::encode($step, $secret, 'HS256');
+                $response['token'] = $token;
+                if (!empty($params['store'])) {
+                    $simulateddata = $quba->prepare_simulated_post_data([$slot => ['payload' => $token]]);
+                    $quba->process_all_actions(time(), $simulateddata);
+                    question_engine::save_questions_usage_by_activity($quba);
+                    $response['newsequence'] = $quba->get_question_attempt($slot)->get_sequence_check_count();
+                }
+                return $response;
+            }
+        }
+
+        return [];
     }
     public static function report_step_grade_returns() {
-        return new external_value(PARAM_BOOL);
+        return new external_single_structure([
+            'token' => new external_value(PARAM_RAW, 'token', VALUE_DEFAULT),
+            'newsequence' => new external_value(PARAM_RAW, 'squencecheck', VALUE_DEFAULT),
+        ]);
     }
 
 

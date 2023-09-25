@@ -15,7 +15,7 @@ class constants
 //component name, db tables, things that define app
 const M_COMPONENT='qtype_minispeak';
 const M_QTABLE='qtype_minispeak_options';
-    
+
 const M_FILEAREA_SUBMISSIONS='submission';
 const M_TABLE='question';
 const M_ATTEMPTSTABLE='minispeak_attempt';
@@ -285,7 +285,7 @@ const M_PUSH_PASSAGE =1;
 const M_PUSH_ALTERNATIVES =2;
 const M_PUSH_QUESTIONS =3;
 const M_PUSH_LEVEL =4;
-  
+
 const M_QUIZ_FINISHED = "qtype_minispeak_quiz_finished";
 const M_QUIZ_REATTEMPT = "qtype_minispeak_quiz_reattempt";
 
@@ -315,5 +315,6 @@ const M_FILE_AREAS = [self::MEDIAQUESTION,self::AUDIOPROMPT,constants::TEXTPROMP
     constants::TEXTPROMPT_FILEAREA . '3',
     constants::TEXTPROMPT_FILEAREA . '4'];
 
+    const TOKENKEYPRIVATE = '_privatekey';
 
 }

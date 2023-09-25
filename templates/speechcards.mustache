@@ -1,4 +1,8 @@
 {{> qtype_minispeak/questionheader}}
+{{#locked}}
+  {{>qtype_minispeak/answercard}}
+{{/locked}}
+{{^locked}}
 {{> qtype_minispeak/progress_dots}}
 
   <div class="minispeak_speechcards-container {{rtl}}">
@@ -18,5 +22,5 @@
     </div>
 
   </div>
-
+{{/locked}}
 {{> qtype_minispeak/questionfooter}}

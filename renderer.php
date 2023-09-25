@@ -36,7 +36,7 @@ use \qtype_minispeak\utils;
  * @copyright  2023 Justin Hunt <justin@poodll.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class qtype_minispeak_renderer extends qtype_with_combined_feedback_renderer {
+class qtype_minispeak_renderer extends qtype_renderer {
 
 
 
@@ -47,10 +47,22 @@ class qtype_minispeak_renderer extends qtype_with_combined_feedback_renderer {
       //  $response = $question->get_response($qa);
         $context = context::instance_by_id($question->contextid);
         $itemdata = utils::fetch_data_for_js($question, $context, $qa);
+        $itemdata->locked = !empty($options->readonly);
+        $questiontype = $itemdata->questiontype;
+        unset($itemdata->questiontype);
+        $payload = $qa->get_last_qt_var('payload');
 
         //this will tell it to not do NEXT screen (ie to just finish)
+        $payloadfield = $qa->get_qt_field_name('payload');
         $itemdata->singlemode=true;
+        $itemdata->payloadfield = str_replace(':', '_', $payloadfield);
+        $itemdata->qubaid = $qa->get_usage_id() . ',' . $qa->get_slot();
 
+        if ($itemdata->locked) {
+            $itemdata->answerContext = [];
+            $payloadJson = utils::decode_payload($payload, $qa->get_last_qt_var(constants::TOKENKEYPRIVATE));
+            $questiontype->export_for_answers((array) $payloadJson, $itemdata);
+        }
 
         $itemshtml=[];
         $itemshtml[] = $this->render_from_template(constants::M_COMPONENT . '/' . $itemdata->type, $itemdata);
@@ -63,34 +75,11 @@ class qtype_minispeak_renderer extends qtype_with_combined_feedback_renderer {
         $ret = html_writer::tag('div', $question->format_questiontext($qa),
             array('class' => 'qtext'));
 
-        $ret .=$question_html . $question_js;
+        $ret .= $question_html . $question_js;
+        $ret .= html_writer::empty_tag('input', ['type' => 'hidden', 'name' => $payloadfield, 'id' => $itemdata->payloadfield,
+                'value' => $payload]);
+
         return $ret;
-
-
-    }
-
-
-
-    public function specific_feedback(question_attempt $qa) {
-        return $this->combined_feedback($qa);
-    }
-
-    /**
-     * Function returns string based on number of correct answers
-     * @param array $right An Array of correct responses to the current question
-     * @return string based on number of correct responses
-     */
-    protected function correct_choices(array $right) {
-        // Return appropriate string for single/multiple correct answer(s).
-        if (count($right) == 1) {
-                return get_string('correctansweris', 'qtype_minispeak',
-                        implode(', ', $right));
-        } else if (count($right) > 1) {
-                return get_string('correctanswersare', 'qtype_minispeak',
-                        implode(', ', $right));
-        } else {
-                return "";
-        }
     }
 
 }

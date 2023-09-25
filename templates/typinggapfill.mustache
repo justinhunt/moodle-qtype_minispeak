@@ -1,4 +1,8 @@
 {{> qtype_minispeak/questionheader}}
+{{#locked}}
+  {{>qtype_minispeak/answercard}}
+{{/locked}}
+{{^locked}}
 <div class="minispeak_tgapfill_player_box gapfill-container">
     <div class="tgapfill_title text-center">{{#str}}typinggapfill, qtype_minispeak{{/str}}</div>
 
@@ -34,4 +38,5 @@
 
     </div>
 </div>
+{{/locked}}
 {{> qtype_minispeak/questionfooter}}

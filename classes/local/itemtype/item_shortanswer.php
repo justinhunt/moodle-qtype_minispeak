@@ -33,6 +33,8 @@ class item_shortanswer extends item {
     //the item type
     public const ITEMTYPE = constants::TYPE_SHORTANSWER;
 
+    /** @var bool $hassubitems indicates whether subitems or single item */
+    protected $hassubitems = false;
 
     /**
      * The class constructor.

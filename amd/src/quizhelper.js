@@ -26,6 +26,7 @@ define(['jquery', 'core/log', 'qtype_minispeak/definitions', 'core/templates', '
       controls: {},
       submitbuttonclass: 'qtype_minispeak_quizsubmitbutton',
       stepresults: [],
+      payloadJson: {},
 
       init: function(quizcontainer, activitydata, cmid, attemptid,polly) {
         this.quizdata = activitydata.quizdata;
@@ -41,6 +42,62 @@ define(['jquery', 'core/log', 'qtype_minispeak/definitions', 'core/templates', '
         this.stt_guided = activitydata.stt_guided;
         this.wwwroot = activitydata.wwwroot;
         this.useanimatecss  = activitydata.useanimatecss;
+        this.questioninstances = [];
+        this.controls.payloadfield = $('#' + this.quizdata[0].payloadfield);
+        this.controls.payloadfield.attr('data-qubaid', this.quizdata[0].qubaid);
+        this.controls.sequencecheck = $('input[name="' + this.controls.payloadfield.attr('name').replace('payload', ':sequencecheck') + '"]');
+        this.controls.status = {
+          hassubitems: this.quizdata[0].hassubitems,
+          card: $(`#${this.quizdata[0].uniqueid}_statuscard`),
+          find: function(name, selector, parent = null) {
+            if (parent && this.hasOwnProperty(parent)) {
+              this[name] = this[parent].find(selector);
+            } else {
+              this[name] = this.card.find(selector);
+            }
+            return this;
+          },
+          op: function(identifiers, callback) {
+            var dd = this;
+            var identifiers = identifiers.split(',');
+            identifiers.forEach(function(identifier) {
+              if (dd.hasOwnProperty(identifier)) {
+                callback(dd[identifier]);
+              }
+            });
+            return dd;
+          },
+          show: function(identifiers) {
+            return this.op(identifiers, function(instance) {
+              instance.attr('data-display', 'show');
+            });
+          },
+          hide: function(identifiers) {
+            return this.op(identifiers, function(instance) {
+              instance.attr('data-display', 'hide');
+            });
+          },
+          hideAll: function() {
+            return this.hide('card,nonattempt,result,summary');
+          },
+          text: function(identifier, text) {
+            if (this.hasOwnProperty(identifier)) {
+              this[identifier].text(text);
+            }
+            return this;
+          },
+          get: function(identifier) {
+            if (this.hasOwnProperty(identifier)) {
+              return this[identifier];
+            }
+          }
+        };
+        this.controls.status.find('result', '.qtype_minispeak_statustext');
+        this.controls.status.find('summary', '[data-region="summary"]', 'result');
+        this.controls.status.find('completed', '[data-region="completedcount"]', 'summary');
+        this.controls.status.find('total', '[data-region="totalcount"]', 'summary');
+        this.controls.status.find('nonattempt', '.qtype_minispeak_statustext_nonattempt');
+        this.controls.status.find('retrybutton', '.qtype_minispeak_retrybutton');
 
         this.prepare_html();
         this.init_questions(this.quizdata,polly);
@@ -52,57 +109,97 @@ define(['jquery', 'core/log', 'qtype_minispeak/definitions', 'core/templates', '
 
         // this.controls.quizcontainer.append(submitbutton);
         this.controls.quizfinished=$("#qtype_minispeak_quiz_finished");
+        this.updateSummaryCard();
 
+      },
+
+      updateSummaryCard: function() {
+        var payload = this.controls.payloadfield.val();
+        if (payload && payload.trim() !== '') {
+          var payloadArr = payload.split('.');
+          try {
+            var payloadEncData = atob(payloadArr[1]);
+            payloadEncData = payloadEncData.replace(/"/g,'').replace(/'/g,'');
+            payloadEncData = atob(payloadEncData);
+            this.payloadJson = JSON.parse(payloadEncData);
+            log.debug(this.payloadJson);
+            if (this.payloadJson.hasgrade) {
+              this.controls.status.show('card,result');
+              if (this.controls.status.hassubitems) {
+                this.controls.status
+                  .text('completed', this.payloadJson.correctitems)
+                  .text('total', this.payloadJson.totalitems)
+                  .show('summary');
+              }
+            } else if (this.quizdata[0].locked) {
+              this.controls.status.show('card,nonattempt');
+            } else {
+              this.controls.status.hideAll();
+            }
+          } catch (e) {
+            log.debug(e);
+          }
+        } else if (this.quizdata[0].locked) {
+            this.controls.status.show('card,nonattempt');
+        } else {
+            this.controls.status.hideAll();
+        }
       },
 
       init_questions: function(quizdata, polly) {
         var dd = this;
         $.each(quizdata, function(index, item) {
+          var questioninstance;
           switch (item.type) {
             case def.qtype_dictation:
-              dictation.clone().init(index, item, dd, polly);
+              questioninstance = dictation.clone();
               break;
             case def.qtype_dictationchat:
-              dictationchat.clone().init(index, item, dd, polly);
+              questioninstance = dictationchat.clone();
               break;
             case def.qtype_multichoice:
-              multichoice.clone().init(index, item, dd);
+              questioninstance = multichoice.clone();
               break;
             case def.qtype_multiaudio:
-                multiaudio.clone().init(index, item, dd);
+                questioninstance = multiaudio.clone();
                 break;
             case def.qtype_speechcards:
               //speechcards init needs to occur when it is visible. lame.
               // so we do that in do_next function, down below
-              speechcards.clone().init(index, item, dd);
+              questioninstance = speechcards.clone();
               break;
             case def.qtype_listenrepeat:
-              listenrepeat.clone().init(index, item, dd);
+              questioninstance = listenrepeat.clone();
               break;
 
              case def.qtype_page:
-                  page.clone().init(index, item, dd);
+                  questioninstance = page.clone();
                   break;
 
               case def.qtype_smartframe:
-                  smartframe.clone().init(index, item, dd);
+                  questioninstance = smartframe.clone();
                   break;
 
               case def.qtype_shortanswer:
-                  shortanswer.clone().init(index, item, dd);
+                  questioninstance = shortanswer.clone();
                   break;
 
               case def.qtype_listeninggapfill:
-                  listeninggapfill.clone().init(index, item, dd);
+                  questioninstance = listeninggapfill.clone();
                   break;
 
               case def.qtype_typinggapfill:
-                  typinggapfill.clone().init(index, item, dd);
+                  questioninstance = typinggapfill.clone();
                   break;
 
               case def.qtype_speakinggapfill:
-                  speakinggapfill.clone().init(index, item, dd);
+                  questioninstance = speakinggapfill.clone();
                   break;
+          }
+
+          if (questioninstance) {
+            questioninstance.init(index, item, dd, polly);
+            dd.questioninstances.push(questioninstance);
           }
 
         });
@@ -118,9 +215,46 @@ define(['jquery', 'core/log', 'qtype_minispeak/definitions', 'core/templates', '
       },
 
       register_events: function() {
+        var dd = this;
         $('.' + this.submitbuttonclass).on('click', function() {
           //do something
         });
+        var retrybutton = this.controls.status.get('retrybutton');
+        if (retrybutton) {
+          retrybutton.on('click', function(e) {
+            e.preventDefault();
+            /* dd.questioninstances.forEach(function(questioninstance) {
+              if (typeof questioninstance.start === 'function') {
+                questioninstance.start();
+              }
+            });
+            dd.controls.payloadfield.val('');
+            dd.updateSummaryCard();
+            if (dd.payloadJson?.hasgrade) {
+              dd.payloadJson = {};
+              dd.report_step_grade(dd.payloadJson);
+            } */
+            dd.report_step_grade({}, false, true).then(function(token) {
+              var reloadcallback = function() {
+                location.reload();
+              }
+              if (token) {
+                  try {
+                    require(['core_form/changechecker'], function(changechecker) {
+                      changechecker.resetFormDirtyState(retrybutton.get(0));
+                      reloadcallback();
+                    });
+                  } catch(e) {
+                    log.debug('old moodle found');
+                    if (M.core_formchangechecker !== undefined) {
+                      M.core_formchangechecker.reset_form_dirty_state();
+                    }
+                    reloadcallback();
+                  }
+              }
+            })
+          })
+        }
       },
       render_quiz_progress:function(current,total){
         var array = [];
@@ -162,7 +296,7 @@ define(['jquery', 'core/log', 'qtype_minispeak/definitions', 'core/templates', '
 
       },
 
-      do_next: function(stepdata){
+      do_next: function(stepdata, showSummary){
         var dd = this;
         //get current question
         var currentquizdataindex =   stepdata.index;
@@ -173,7 +307,7 @@ define(['jquery', 'core/log', 'qtype_minispeak/definitions', 'core/templates', '
 
         //post grade
          // log.debug("reporting step grade");
-        dd.report_step_grade(stepdata);
+        dd.report_step_grade(stepdata, showSummary);
 
         //in single mode do no do_next
         if(currentitem.singlemode===true){return;}
@@ -251,26 +385,41 @@ define(['jquery', 'core/log', 'qtype_minispeak/definitions', 'core/templates', '
 
           //we want to destroy the old question in the DOM also because iframe/media content might be playing
           theoldquestion.remove();
-        
+
       },
 
-      report_step_grade: function(stepdata) {
+      report_step_grade: function(stepdata, showSummary, store = true) {
         var dd = this;
 
         //store results locally
         this.stepresults.push(stepdata);
+
+        log.debug(stepdata);
 
         //push results to server
         var ret = Ajax.call([{
           methodname: 'qtype_minispeak_report_step_grade',
           args: {
             cmid: dd.cmid,
-            step: JSON.stringify(stepdata),
+            qubaid: dd.quizdata[0].qubaid,
+            step: btoa(JSON.stringify(stepdata)),
+            store: Boolean(store)
           },
           async: false
-        }])[0];
+        }])[0].then(function(response) {
+          if (response.newsequence) {
+            dd.controls.sequencecheck.val(response.newsequence);
+          }
+          if (response.token) {
+            dd.controls.payloadfield.val(response.token);
+            if (showSummary) {
+              dd.updateSummaryCard();
+            }
+            return response.token;
+          }
+        });
         log.debug("report_step_grade success: " + ret);
-
+        return ret;
       },
 
 

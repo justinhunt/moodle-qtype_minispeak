@@ -10,6 +10,8 @@ define(['jquery', 'core/log', 'qtype_minispeak/definitions', 'qtype_minispeak/po
 
   return {
 
+    answers: {},
+
     //for making multiple instances
       clone: function () {
           return $.extend(true, {}, this);
@@ -36,18 +38,19 @@ define(['jquery', 'core/log', 'qtype_minispeak/definitions', 'qtype_minispeak/po
       stepdata.totalitems = 1;
       stepdata.correctitems = percent>0?1:0;
       stepdata.grade = percent;
-      self.quizhelper.do_next(stepdata);
+      stepdata.answers = self.answers;
+      self.quizhelper.do_next(stepdata, true);
     },
 
     register_events: function(index, itemdata, quizhelper) {
-      
+
       var self = this;
       self.index = index;
       self.quizhelper = quizhelper;
       var chosenelement=null;
       var theplayer = $("#" + itemdata.uniqueid + "_player");
       var nextbutton = $("#" + itemdata.uniqueid + "_container .minispeak_nextbutton");
-      
+
       nextbutton.on('click', function(e) {
         self.next_question(0);
       });
@@ -90,6 +93,10 @@ define(['jquery', 'core/log', 'qtype_minispeak/definitions', 'qtype_minispeak/po
           //highlight selected answers
           $("#" + itemdata.uniqueid + "_option" + checked).addClass('minispeak_mc_selected');
           var percent = checked == itemdata.correctanswer ? 100 : 0;
+          self.answers[0] = {
+            answer: checked,
+            correct: checked == itemdata.correctanswer,
+          };
 
           $(".minispeak_nextbutton").prop("disabled", true);
           setTimeout(function() {
@@ -147,7 +154,7 @@ define(['jquery', 'core/log', 'qtype_minispeak/definitions', 'qtype_minispeak/po
                 self.playing = false;
             }
         });
-      
+
     },
 
       showConfirmButton: function(itemdata) {

@@ -9,6 +9,8 @@ define(['jquery', 'core/log', 'qtype_minispeak/definitions', 'qtype_minispeak/po
 
   return {
 
+    answers: {},
+
     playing: false,
 
       //for making multiple instances
@@ -42,6 +44,26 @@ define(['jquery', 'core/log', 'qtype_minispeak/definitions', 'qtype_minispeak/po
 
       var theplayer = $("#" + itemdata.uniqueid + "_player");
 
+      var lastgrade = null;
+      var totalanswer = $('#' + itemdata.uniqueid + '_container .dictate-feedback').length;
+
+      function updateGrade() {
+        var stepdata = {};
+        var correctanswer = $('#' + itemdata.uniqueid + '_container .dictate-feedback.fa-check').length;
+        var grade = Math.round(100 * correctanswer / totalanswer, 2);
+        if (grade === lastgrade) {
+          return;
+        }
+        lastgrade = grade;
+        stepdata.index = qindex;
+        stepdata.hasgrade = true;
+        stepdata.grade = grade;
+        stepdata.totalitems=totalanswer;
+        stepdata.correctitems=correctanswer;
+        stepdata.answers = self.answers;
+        quizhelper.do_next(stepdata);
+      }
+
       //key events in text box
       $("#" + itemdata.uniqueid + "_container .poodlldictationinput input").on("input", function(e) {
 
@@ -56,13 +78,17 @@ define(['jquery', 'core/log', 'qtype_minispeak/definitions', 'qtype_minispeak/po
             correct = quizhelper.cleanText(correct);
             typed = quizhelper.cleanText(typed);
         }
+        self.answers[index] = {
+          answer: typed,
+          correct: correct == typed
+        };
 
         if (correct == typed) {
           $("#"+itemdata.uniqueid+"_container .dictate-feedback[data-index='" + index + "']").removeClass("fa-times").addClass("fa-check").css("color","green").show();
         } else {
           $("#"+itemdata.uniqueid+"_container .dictate-feedback[data-index='" + index + "']").removeClass("fa-check").addClass("fa-times").css("color","red").show();
         }
-
+        updateGrade();
       });
 
       //audio play requests
@@ -81,19 +107,7 @@ define(['jquery', 'core/log', 'qtype_minispeak/definitions', 'qtype_minispeak/po
       });
 
       //When click next button , report and leave it up to parent to eal with it.
-      $("#" + itemdata.uniqueid + "_container .minispeak_nextbutton").on('click', function(e) {
-        var stepdata = {};
-        var correct = $('#' + itemdata.uniqueid + '_container .dictate-feedback.fa-check').length;
-        var total = $('#' + itemdata.uniqueid + '_container .dictate-feedback').length;
-        var grade = Math.round(correct / total, 2) * 100;
-        stepdata.index = qindex;
-        stepdata.hasgrade = true;
-        stepdata.grade = grade;
-        stepdata.totalitems=total;
-        stepdata.correctitems=correct;
-        stepdata.grade = grade;
-        quizhelper.do_next(stepdata);
-      });
+      $("#" + itemdata.uniqueid + "_container .minispeak_nextbutton").on('click', updateGrade);
     }
   }; //end of return value
 });

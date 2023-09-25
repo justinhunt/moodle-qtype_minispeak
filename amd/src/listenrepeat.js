@@ -13,6 +13,8 @@ define(['jquery',
 
   return {
 
+      answers: {},
+
       //for making multiple instances
       clone: function () {
           return $.extend(true, {}, this);
@@ -68,7 +70,7 @@ define(['jquery',
         self.getItems();
     },
 
-    next_question:function(percent){
+    next_question:function(showSummary){
       var self=this;
       var stepdata = {};
       stepdata.index = self.index;
@@ -76,7 +78,14 @@ define(['jquery',
       stepdata.totalitems=self.items.length;
       stepdata.correctitems=self.items.filter(function(e) {return e.correct;}).length;
       stepdata.grade = Math.round((stepdata.correctitems/stepdata.totalitems)*100);
-      self.quizhelper.do_next(stepdata);
+      stepdata.answers = self.items.reduce(function(answers, item, index) {
+        if (!answers[index]) {
+          answers[index] = {};
+        }
+        answers[index].correct = Boolean(item.correct);
+        return answers;
+      }, self.answers);
+      self.quizhelper.do_next(stepdata, showSummary);
     },
     register_events: function() {
 
@@ -122,9 +131,9 @@ define(['jquery',
           }
 
       });
-      
+
     },
-    
+
 
     game: {
       pointer: 0
@@ -187,9 +196,9 @@ define(['jquery',
       $("#" + self.itemdata.uniqueid + "_container .landr_feedback").removeClass("fa fa-check fa-times");
 
       var allCorrect = comparison.filter(function(e){return !e.matched;}).length==0;
-      
+
       if (allCorrect && comparison && comparison.length>0) {
-        
+
         $("#" + self.itemdata.uniqueid + "_container .landr_targetWord").addClass("landr_correct");
         $("#" + self.itemdata.uniqueid + "_container .landr_feedback").addClass("fa fa-check");
         $("#" + self.itemdata.uniqueid + "_container .landr_speech.landr_teacher_left").text(self.items[self.game.pointer].prompt + "");
@@ -259,7 +268,12 @@ define(['jquery',
     },
     getComparison: function(passage, transcript, phonetic, callback) {
       var self = this;
-      
+
+      if (!self.answers[self.game.pointer]) {
+        self.answers[self.game.pointer] = {};
+      }
+      self.answers[self.game.pointer].answer = transcript;
+
       $(".landr_ctrl-btn").prop("disabled", true);
       self.quizhelper.comparePassageToTranscript(passage,transcript,phonetic,self.itemdata.language).then(function(ajaxresult) {
             var payloadobject = JSON.parse(ajaxresult);
@@ -275,10 +289,10 @@ define(['jquery',
       var self = this;
       $(".minispeak_nextbutton").prop("disabled",true);
       setTimeout(function() {
-        
+
         $(".minispeak_nextbutton").prop("disabled",false);
-        self.next_question();
-        
+        self.next_question(true);
+
       }, 2200);
 
     },
@@ -294,6 +308,7 @@ define(['jquery',
         item.answered = false;
         item.correct = false;
       });
+      self.answers = {};
 
       self.game.pointer = 0;
 

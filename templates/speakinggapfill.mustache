@@ -1,4 +1,8 @@
 {{> qtype_minispeak/questionheader}}
+{{#locked}}
+  {{>qtype_minispeak/answercard}}
+{{/locked}}
+{{^locked}}
 <div class="minispeak_sgapfill_player_box gapfill-container">
     <div style="display:none;" class="sgapfill_results">{{#str}}dc_results, qtype_minispeak{{/str}}</div>
 
@@ -46,5 +50,5 @@
 
 
 </div>
-
+{{/locked}}
 {{> qtype_minispeak/questionfooter}}

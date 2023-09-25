@@ -12,6 +12,8 @@ define(['jquery',
 
     return {
 
+        answers: {},
+
         // For making multiple instances
         clone: function() {
             return $.extend(true, {}, this);
@@ -36,7 +38,7 @@ define(['jquery',
             self.appReady();
         },
 
-        next_question: function() {
+        next_question: function(showSummary) {
             var self = this;
             var stepdata = {};
             stepdata.index = self.index;
@@ -46,7 +48,8 @@ define(['jquery',
                 return e.correct;
             }).length;
             stepdata.grade = Math.round((stepdata.correctitems / stepdata.totalitems) * 100);
-            self.quizhelper.do_next(stepdata);
+            stepdata.answers = self.answers;
+            self.quizhelper.do_next(stepdata, showSummary);
         },
 
         register_events: function() {
@@ -184,7 +187,7 @@ define(['jquery',
             characterunputs.each(function() {
                 var index = $(this).data('index');
                 var value = $(this).val();
-                transcript.push = ({
+                transcript.push({
                     index: index,
                     value: value
                 });
@@ -211,6 +214,7 @@ define(['jquery',
                     target: target.sentence,
                     prompt: target.prompt,
                     parsedstring: target.parsedstring,
+                    definition: target.definition,
                     typed: "",
                     timer: [],
                     answered: false,
@@ -243,12 +247,18 @@ define(['jquery',
 
         gotComparison: function(comparison) {
             var self = this;
+            log.debug("gotComparison", comparison);
             var timelimit_progressbar = $("#" + self.itemdata.uniqueid + "_container .progress-container .progress-bar");
             if (comparison) {
                 $("#" + self.itemdata.uniqueid + "_container .lgapfill_reply_" + self.game.pointer + " .lgapfill_feedback[data-idx='" + self.game.pointer + "']").addClass("fa fa-check");
                 self.items[self.game.pointer].answered = true;
                 self.items[self.game.pointer].correct = true;
                 self.items[self.game.pointer].typed = false;
+                //if they got it correct, make the input boxes green and move forward
+                log.debug("correct!!");
+                $("#" + self.itemdata.uniqueid + "_container .lgapfill_reply_" + self.game.pointer + " input").addClass("ms_gapfill_char_correct");
+
+
                 //if they cant retry OR the time limit is up, move on
             } else if(!self.itemdata.allowretry || timelimit_progressbar.hasClass('progress-bar-complete')) {
                 $("#" + self.itemdata.uniqueid + "_container .lgapfill_reply_" + self.game.pointer + " .lgapfill_feedback[data-idx='" + self.game.pointer + "']").addClass("fa fa-times");
@@ -319,6 +329,11 @@ define(['jquery',
                 }
             });
 
+            self.answers[self.game.pointer] = {
+                answer: transcript,
+                correct: Boolean(correctanswer),
+            };
+
             callback(correctanswer);
         },
 
@@ -327,7 +342,7 @@ define(['jquery',
             $(".minispeak_nextbutton").prop("disabled", true);
             setTimeout(function() {
                 $(".minispeak_nextbutton").prop("disabled", false);
-                self.next_question();
+                self.next_question(true);
             }, 2000);
         },
 
@@ -341,6 +356,7 @@ define(['jquery',
                 item.answered = false;
                 item.correct = false;
             });
+            self.answers = {};
 
             self.game.pointer = 0;
             $("#" + self.itemdata.uniqueid + "_container .lgapfill_listen_cont").show();
@@ -395,6 +411,12 @@ define(['jquery',
                 }
             });
             code += " <i data-idx='" + self.game.pointer + "' class='lgapfill_feedback'></i></div>";
+            if((self.items[self.game.pointer].definition )!=='') {
+                //hint or definition
+                code += "<div class='definition-container'>";
+                code += "<div class='definition'>" + self.items[self.game.pointer].definition + "</div>";
+                code += "</div>";
+            }
 
             code += "</div>";
             $("#" + self.itemdata.uniqueid + "_container .question").append(code);

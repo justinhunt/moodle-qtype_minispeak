@@ -1,0 +1,7 @@
+<div id="{{{uniqueid}}}_statuscard" class="minispeak_question_statuscard" data-display="hide">
+    {{#typenicename}}<h4 class="qtype_minispeak_typenicename bold">{{typenicename}}</h4>{{/typenicename}}
+    {{#iteminstructions}}<div class="qtype_minispeak_iteminstructions">{{iteminstructions}}</div>{{/iteminstructions}}
+    <div class="qtype_minispeak_statustext" data-display="hide">{{#str}} completed, qtype_minispeak {{/str}}<span data-region="summaryresult" data-display="hide"> <span data-region="completedcount"></span> / <span data-region="totalcount"></span></span></div>
+    <div class="qtype_minispeak_statustext_nonattempt" data-display="hide">{{#str}} nonattempted, qtype_minispeak {{/str}}</div>
+    {{#allowretry}}<div class="qtype_minispeak_retrybutton"><button type="button">{{#str}} reattempt, qtype_minispeak {{/str}}</button></div>{{/allowretry}}
+</div>
