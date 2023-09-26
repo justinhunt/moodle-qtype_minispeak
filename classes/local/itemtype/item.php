@@ -570,7 +570,7 @@ abstract class item implements templatable, renderable {
      * Takes an array of sentences and phonetics for the same, and returns sentence objects with display and spoken and phonetic data
      *
      */
-    protected function process_spoken_sentences($sentences,$phonetics, $dottify=false){
+    protected function process_spoken_sentences($sentences,$phonetics, $dottify=false, $is_ssml=false){
         //build a sentences object for mustache and JS
         $index = 0;
         $sentenceobjects = [];
@@ -606,6 +606,13 @@ abstract class item implements templatable, renderable {
                     $prompt = $sentence;
                     $displayprompt = $sentence;
                 }
+            }
+
+            //we strip the HTML tags off if it is SSML
+            //probably no harm in doing this if its SSML or not ...
+            if($is_ssml) {
+                $displayprompt = strip_tags($displayprompt );
+                $sentence = strip_tags($sentence);
             }
 
             if ($this->language == constants::M_LANG_JAJP) {
