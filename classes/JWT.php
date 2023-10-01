@@ -403,7 +403,7 @@ class JWT
     private static function signatureToDER($sig)
     {
         // Separate the signature into r-value and s-value
-        list($r, $s) = \str_split($sig, (int) (\strlen($sig) / 2));
+        list($r, $s) = \mb_str_split($sig, (int) (\strlen($sig) / 2));
 
         // Trim leading zeros
         $r = \ltrim($r, "\x00");
