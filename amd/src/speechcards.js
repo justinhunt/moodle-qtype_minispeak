@@ -45,6 +45,7 @@ define(['jquery',
         displayterms: [],
         results: [],
         controls: {},
+        ttrec: null, //a handle on the tt recorder
 
         init: function() {
 
@@ -165,7 +166,11 @@ log.debug('correct:',correct_clean);
              opts.uniqueid = itemdata.uniqueid;
              opts.callback = theCallback;
              opts.stt_guided=quizhelper.is_stt_guided();
-             ttrecorder.clone().init(opts);
+             app.ttrec = ttrecorder.clone();
+             app.ttrec.init(opts);
+             //init prompt for first card
+             //in some cases ttrecorder wants to know the target
+             app.ttrec.currentPrompt=app.displayterms[app.pointer - 1];
          }else{
              //init cloudpoodll push recorder
              cloudpoodll.init('minispeak-recorder-speechcards-' + itemdata.id, theCallback);
@@ -273,6 +278,11 @@ log.debug('correct:',correct_clean);
           app.clearStarRating();
           if (!app.is_end()) {
             app.writeCurrentTerm();
+            //in some cases ttrecorder wants to know the target
+            if(quizhelper.use_ttrecorder()) {
+                app.ttrec.currentPrompt=app.displayterms[app.pointer - 1];
+            }
+
           } else {
             app.do_end();
           }

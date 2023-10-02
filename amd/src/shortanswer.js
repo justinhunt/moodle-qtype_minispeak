@@ -16,12 +16,15 @@ define(['jquery',
 
   return {
 
+    //a handle on the tt recorder
+    ttrec: null,
+
     answers: {},
 
     passmark: 90,//lower this if it often doesnt match (was 85)
 
     //for making multiple instances
-      clone: function () {
+     clone: function () {
           return $.extend(true, {}, this);
      },
 
@@ -95,7 +98,7 @@ define(['jquery',
 
       //clean the text of any junk
       for(var i=0;i<sentences.length;i++){
-          sentences[i].originalsentence= sentences[i].sentence
+          sentences[i].originalsentence= sentences[i].sentence;
           sentences[i].sentence=quizhelper.cleanText(sentences[i].sentence);
       }
 
@@ -196,7 +199,18 @@ define(['jquery',
       log.debug('sa uniqueid:' + itemdata.uniqueid);
       opts.callback = theCallback;
       opts.stt_guided=quizhelper.is_stt_guided();
-      ttrecorder.clone().init(opts);
+      app.ttrec = ttrecorder.clone();
+      app.ttrec.init(opts);
+
+      //set the prompt for TT Rec
+      var allsentences="";
+      for(var i=0;i<sentences.length;i++){
+        allsentences += sentences[i].sentence + ' ';
+        sentences[i].originalsentence= sentences[i].sentence;
+        sentences[i].sentence=quizhelper.cleanText(sentences[i].sentence);
+      }
+      app.ttrec.currentPrompt=allsentences;
+
 
     } ,//end of init components
 

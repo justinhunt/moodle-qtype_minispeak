@@ -12,6 +12,8 @@ define(['jquery',
   log.debug('minispeak listen and repeat: initialising');
 
   return {
+      //a handle on the tt recorder
+      ttrec: null,
 
       answers: {},
 
@@ -50,7 +52,8 @@ define(['jquery',
             opts.callback = theCallback;
             opts.stt_guided=quizhelper.is_stt_guided();
             opts.wwwroot=quizhelper.is_stt_guided();
-            ttrecorder.clone().init(opts);
+            self.ttrec = ttrecorder.clone();
+            self.ttrec.init(opts);
         }else{
             //init cloudpoodll push recorder
             cloudpoodll.init('minispeak-recorder-listenrepeat-' + itemdata.id, theCallback);
@@ -324,7 +327,12 @@ define(['jquery',
       var showText = parseInt(this.itemdata.show_text);
       var self = this;
 
+      //target is the speech we expect
       var target = self.items[self.game.pointer].target;
+      //in some cases ttrecorder wants to know the target
+      if(self.quizhelper.use_ttrecorder()) {
+        self.ttrec.currentPrompt=target;
+      }
       var displayprompt = self.items[self.game.pointer].displayprompt;
       var code = "<div class='landr_prompt landr_prompt_" + self.game.pointer + "' style='display:none;'>";
 
