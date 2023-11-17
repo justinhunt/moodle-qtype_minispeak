@@ -33,6 +33,9 @@ class item_page extends item {
     //the item type
     public const ITEMTYPE = constants::TYPE_PAGE;
 
+    /** @var bool $hassubitems indicates whether subitems or single item */
+    protected $hassubitems = false;
+
 
     /**
      * Export the data for the mustache template.

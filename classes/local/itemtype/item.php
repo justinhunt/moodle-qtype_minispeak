@@ -518,7 +518,7 @@ abstract class item implements templatable, renderable {
                 }
             }
 
-            $characters = str_split($sentence);
+            $characters = \mod_minilesson\utils::do_mb_str_split($sentence);
 
             $wordindex = 0;
             foreach ($characters as $character) {
@@ -1069,6 +1069,10 @@ abstract class item implements templatable, renderable {
         $answerContext = new stdClass;
         $objclass = get_class($this);
         if (!empty($templateContext->hassubitems)) {
+            //this should not really happen but let's handle it anyway
+            if(is_null($templateContext->sentences)) {
+                $templateContext->sentences = [];
+            }
             for($i = 0; $i < count($templateContext->sentences); $i++) {
                 $answerContext->answers[$i] = (object) ['correct' => false, 'index' => $i + 1];
                 switch($objclass) {
