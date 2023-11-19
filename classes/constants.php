@@ -272,6 +272,18 @@ const M_LANG_EUES ='eu-ES';
 const M_LANG_FIFI ='fi-FI';
 const M_LANG_HUHU='hu-HU';
 
+const M_LANG_BGBG = 'bg-BG';
+const M_LANG_CSCZ = 'cs-CZ';
+const M_LANG_ELGR = 'el-GR';
+const M_LANG_HRHR = 'hr-HR';
+const M_LANG_LTLT = 'lt-LT';
+const M_LANG_LVLV = 'lv-LV';
+const M_LANG_SKSK = 'sk-SK';
+const M_LANG_SLSI = 'sl-SI';
+const M_LANG_ISIS = 'is-IS';
+const M_LANG_MKMK = 'mk-MK';
+const M_LANG_SRRS = 'sr-RS';
+
 const M_PROMPT_SEPARATE=0;
 const M_PROMPT_RICHTEXT=1;
 
