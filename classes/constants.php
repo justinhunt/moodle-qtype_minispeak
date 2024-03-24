@@ -39,7 +39,7 @@ const M_USE_PAGEDTABLES=1;
 
 const M_NEURALVOICES = array("Amy","Emma","Brian","Olivia","Aria","Ayanda","Ivy","Joanna","Kendra","Kimberly",
         "Salli","Joey","Justin","Kevin","Matthew","Camila","Lupe", "Gabrielle", "Vicki", "Seoyeon","Takumi", "Lucia",
-        "Lea","Bianca","Laura","Kajal","Suvi","Liam","Daniel","Hannah","Camila");
+        "Lea","Bianca","Laura","Kajal","Suvi","Liam","Daniel","Hannah","Camila","Elin","Kazuha","Tomoko");
 
 
 //grading options
