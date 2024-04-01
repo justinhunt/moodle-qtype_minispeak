@@ -518,7 +518,8 @@ abstract class item implements templatable, renderable {
                 }
             }
 
-            $characters = \mod_minilesson\utils::do_mb_str_split($sentence);
+            $enc = mb_detect_encoding($sentence);
+            $characters = \mod_minilesson\utils::do_mb_str_split($sentence,1,$enc);
 
             $wordindex = 0;
             foreach ($characters as $character) {
