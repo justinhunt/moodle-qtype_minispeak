@@ -112,7 +112,7 @@ This file contains class and ID definitions.
         msvbuttonsbox: 'qtype_minispeak_msvbuttonsbox',
 
         //VOICES
-        voices: {'ar-AR': ['Zeina'],
+        voices: {'ar-AR': ['Zeina','Hala','Zayd'],
             'de-DE': ['Hans','Marlene','Vicki'],
             'en-US': ['Joey','Justin','Kevin','Matthew','Ivy','Joanna','Kendra','Kimberly','Salli'],
             'en-GB': ['Brian','Amy', 'Emma'],
@@ -127,7 +127,7 @@ This file contains class and ID definitions.
             'fr-FR': ['Mathieu','Celine','Lea'],
             'hi-IN': ["Aditi"],
             'it-IT': ['Carla','Bianca','Giorgio'],
-            'ja-JP': ['Takumi','Mizuki'],
+            'ja-JP': ['Takumi','Mizuki','Kazuha','Tomoko'],
             'ko-KR': ['Seoyeon'],
             'nl-NL': ["Ruben","Lotte"],
             'pt-BR': ['Ricardo','Vitoria'],
@@ -138,7 +138,8 @@ This file contains class and ID definitions.
         },
 
         neural_voices: ["Amy","Emma","Brian","Olivia","Aria","Ayanda","Ivy","Joanna","Kendra","Kimberly",
-            "Salli","Joey","Justin","Kevin","Matthew","Camila","Lupe","Lucia","Gabrielle","Lea", "Vicki", "Seoyeon", "Takumi"]
+            "Salli","Joey","Justin","Kevin","Matthew","Camila","Lupe","Lucia","Gabrielle","Lea", "Vicki", "Seoyeon", "Takumi","Lucia",
+            "Lea","Bianca","Laura","Kajal","Suvi","Liam","Daniel","Hannah","Camila","Ida","Kazuha","Tomoko","Elin","Hala","Zayd"]
 
     };//end of return value
 });

@@ -9,16 +9,15 @@
 
 global $CFG;
 require_once($CFG->libdir . '/externallib.php');
+use core_external\external_api;
+use core_external\external_function_parameters;
+use core_external\external_value;
 
 use qtype_minispeak\utils;
 use qtype_minispeak\constants;
 use qtype_minispeak\diff;
 use qtype_minispeak\alphabetconverter;
 use qtype_minispeak\local\itemtype\item;
-
-use external_api;
-use external_function_parameters;
-use external_value;
 use qtype_minispeak\JWT;
 
 /**
@@ -135,7 +134,7 @@ class qtype_minispeak_external extends external_api {
     public static function report_step_grade_returns() {
         return new external_single_structure([
             'token' => new external_value(PARAM_RAW, 'token', VALUE_DEFAULT),
-            'newsequence' => new external_value(PARAM_RAW, 'squencecheck', VALUE_DEFAULT),
+            'newsequence' => new external_value(PARAM_RAW, 'sequencecheck', VALUE_DEFAULT),
         ]);
     }
 
@@ -145,9 +144,9 @@ class qtype_minispeak_external extends external_api {
                 array('transcript' => new external_value(PARAM_TEXT, 'The spoken phrase'),
                         'passage' => new external_value(PARAM_TEXT, 'The correct phrase'),
                         'language' => new external_value(PARAM_TEXT, 'The language eg en-US'),
-                        'alternatives' => new external_value(PARAM_TEXT, 'list of alternatives',false,''),
-                        'phonetic' => new external_value(PARAM_TEXT, 'phonetic reading',false,''),
-                        'region' => new external_value(PARAM_TEXT, 'The region',false,'tokyo'),
+                        'alternatives' => new external_value(PARAM_TEXT, 'list of alternatives',VALUE_DEFAULT,''),
+                        'phonetic' => new external_value(PARAM_TEXT, 'phonetic reading',VALUE_DEFAULT,''),
+                        'region' => new external_value(PARAM_TEXT, 'The region',VALUE_DEFAULT,'tokyo'),
                         'cmid' => new external_value(PARAM_INT, 'The cmid')
                 )
         );

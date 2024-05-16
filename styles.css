@@ -1120,6 +1120,7 @@ div.qtype_minispeak_feedback_cont.qtype_minispeak_postattempt {
 
 .minispeak_mc_resultbox {
     float: right;
+    padding-left: 8px;
 }
 
 .mcplayrow {
@@ -2602,7 +2603,6 @@ span.qtype_minispeak_finishedanswer {
 /* the background color of gapfill words char inputs when marked correct */
 .ms_gapfill_char_correct {
     background-color: palegreen;
-<<<<<<< HEAD
 }
 
 .minispeak_questioncontainer {
@@ -2652,6 +2652,9 @@ span.qtype_minispeak_finishedanswer {
     background-color: #b1c7b1;
     letter-spacing: 0.05rem;
     padding: 0 0.1rem;
-=======
->>>>>>> 120f3e3eae9c5e0e3638eaa8253128757ede749f
+}
+
+.qtype_minispeak_rtl {
+    direction: rtl;
+    text-align: right;
 }
