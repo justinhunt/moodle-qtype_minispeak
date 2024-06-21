@@ -527,11 +527,21 @@ $string['reattempttitle'] = 'Really Try Again?';
 $string['reattemptbody'] = 'If you continue your previous attempt will be replaced with this one. OK?';
 
 //media toggles
-$string['addmedia'] = 'Add Media';
-$string['addiframe'] = 'Add iFrame';
-$string['addttsaudio'] = 'Add TTS Audio';
-$string['addtextarea'] = 'Add Text Block';
-$string['addyoutubeclip'] = 'Add YouTube Clip';
+$string['addmedia'] = 'Image / audio or video';
+$string['addmedia_instructions'] = 'Choose the media type you want to show in the lesson item.';
+$string['addiframe'] = 'iFrame / custom HTML';
+$string['addiframe_instructions'] = 'Paste the embed code for the iframe you want to show in the lesson item.';
+$string['addttsaudio'] = 'TTS Audio';
+$string['addttsaudio_instructions'] = 'Enter the text you want to be spoken by the TTS engine.';
+$string['addtextarea'] = 'Text Block';
+$string['addtextarea_instructions'] = 'Enter the text you want to show in the lesson item.';
+$string['addyoutubeclip'] = 'YouTube Clip';
+$string['addyoutubeclip_instructions'] = 'Enter the Youtube/Vimeo video ID and start and end times for the clip you want to show in the lesson item.';
+$string['addttsdialog'] = "TTS Dialog";
+$string['addttsdialog_instructions'] = "Add TTS Dialog";
+$string['addttspassage'] = "TTS Passage";
+$string['ttspassageinstructions']="Choose the speaker voice and speed, and enter the passage to be read.";
+$string['addttspassage_instructions']="Choose the speaker voice and speed, and enter the passage to be read.";
 
 //showtextprompt
 $string['showtextprompt'] = 'Show text prompt';
@@ -681,3 +691,10 @@ $string['nonattempted'] = 'Not attempted';
 $string['correctanswer'] = 'Your answer was correct';
 $string['incorrectanswer'] = 'Your answer was incorrect';
 $string['correctansweris'] = 'Correct answer : {$a}';
+
+$string["reallydeletemediaprompt"]="Really delete media: ";
+$string["deletemediaprompt"]="Delete media?";
+$string["choosemediaprompt"]="Choose media type ..";
+$string["deletefilesfirst"]="Delete any files you added manually. They will not be deleted automatically.";
+$string["cleartextfirst"]="Clear any content you added manually. It will not be deleted automatically.";
+$string["itemsettingsheadings"]="Item Settings";

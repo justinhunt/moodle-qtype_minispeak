@@ -128,9 +128,10 @@ class qtype_minispeak_edit_form extends question_edit_form {
     }
 */
     protected function data_preprocessing($question) {
+        global $PAGE;
+
         $question = parent::data_preprocessing($question);
 
-        
         //Setup our checkbox group initial values 
         //make sure the media upload fields are in the correct state
         $fs = get_file_storage();
@@ -206,6 +207,28 @@ class qtype_minispeak_edit_form extends question_edit_form {
             $question->showstandardinstruction = $question->options->showstandardinstruction;
         }
 */
+
+        //show the fields by default if they have some content
+        $visibility =['addmedia'=>$question->addmedia,
+            'addiframe'=>$question->addiframe,
+            'addttsaudio'=>$question->addttsaudio,
+            'addtextarea'=>$question->addtextarea,
+            'addyoutubeclip'=>$question->addyoutubeclip,
+            'addttsdialog'=>$question->addttsdialog,
+            'addttspassage'=>$question->addttspassage];
+        $PAGE->requires->js_call_amd(constants::M_COMPONENT . '/mediaprompts', 'init', [$visibility]);
+
+        //expand the media prompts area if we have some data
+         if($question->addmedia ||
+            $question->addiframe ||
+            $question->addttsaudio ||
+            $question->addtextarea ||
+            $question->addyoutubeclip ||
+            $question->addttsdialog ||
+            $question->addttspassage){
+                $this->_form->setExpanded('mediapromptsheading');
+         }
+         
 
         return $question;
     }

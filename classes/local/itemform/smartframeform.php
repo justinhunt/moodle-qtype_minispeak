@@ -16,7 +16,6 @@ class smartframeform extends baseform
     public $type = constants::TYPE_SMARTFRAME;
 
     public function custom_definition() {
-
         $this->add_textboxresponse(1,'smartframeurl',true);
 
     }

@@ -15,6 +15,7 @@ class speakinggapfillform extends baseform {
     public $type = constants::TYPE_SGAPFILL;
 
     public function custom_definition() {
+
         $mform = $this->_form;
         $this->addElement('advcheckbox',constants::READSENTENCE,
             get_string('readsentences',constants::M_COMPONENT),

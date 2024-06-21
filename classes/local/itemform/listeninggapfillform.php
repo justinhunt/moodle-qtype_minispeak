@@ -15,7 +15,6 @@ class listeninggapfillform extends baseform {
     public $type = constants::TYPE_LGAPFILL;
 
     public function custom_definition() {
-
         $this->add_voiceselect(constants::POLLYVOICE,get_string('choosevoice',constants::M_COMPONENT));
         $no_ssml=true;
         $hideif_field=false;

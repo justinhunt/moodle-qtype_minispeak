@@ -17,7 +17,6 @@ class listenrepeatform extends baseform
     public $type = constants::TYPE_LISTENREPEAT;
 
     public function custom_definition() {
-        //nothing here
         $this->add_showtextpromptoptions(constants::SHOWTEXTPROMPT,get_string('showtextprompt',constants::M_COMPONENT));
         $this->add_voiceselect(constants::POLLYVOICE,get_string('choosevoice',constants::M_COMPONENT));
         $this->add_voiceoptions(constants::POLLYOPTION,get_string('choosevoiceoption',constants::M_COMPONENT));
