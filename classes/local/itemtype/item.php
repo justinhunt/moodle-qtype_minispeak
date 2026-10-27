@@ -50,6 +50,9 @@ abstract class item implements templatable, renderable {
     /** @var \stdClass $itemrecord The db record for the item. */
     protected $itemrecord;
 
+    /** @var \stdClass the question this item belongs to */
+    protected $question;
+
     /** @var \stdClass $context The mod context. */
     protected $context;
 
@@ -216,7 +219,9 @@ abstract class item implements templatable, renderable {
         $itemtext =  file_rewrite_pluginfile_urls($itemrecord->{constants::TEXTQUESTION},
             'pluginfile.php', $this->context->id,constants::M_COMPONENT,
             constants::TEXTQUESTION_FILEAREA, $testitem->id);
-        $itemtext = format_text($itemtext, FORMAT_MOODLE, $editoroptions);
+        // Only the formatting options: format_text() rejects the file options from Moodle 4.4.
+        $itemtext = format_text($itemtext, FORMAT_MOODLE,
+            array_intersect_key($editoroptions, ['context' => 1, 'noclean' => 1]));
         if(!empty($itemtext)) {
             $testitem->itemtext = $itemtext;
         }
@@ -938,7 +943,7 @@ abstract class item implements templatable, renderable {
         $ret = false;
 
         if (!$DB->delete_records(constants::M_QTABLE, array('questionid' => $questionid))) {
-            print_error("Could not delete item");
+            throw new \moodle_exception("Could not delete item");
             return $ret;
         }
         //remove files

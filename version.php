@@ -26,7 +26,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'qtype_minispeak';
-$plugin->version   = 2022052300;
+$plugin->version   = 2026102700;
+$plugin->release   = '1.0.17 (Build 2026102700)';
 
 $plugin->requires  = 2016052300;
 

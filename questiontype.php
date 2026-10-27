@@ -40,6 +40,9 @@ use \qtype_minispeak\utils;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_minispeak extends question_type {
+    /** @var string TTS language, set by the item forms. */
+    public $ttslanguage = 'en-US';
+
     public function get_question_options($question) {
         global $DB, $OUTPUT;
 
@@ -104,7 +107,7 @@ class qtype_minispeak extends question_type {
 
         $result = $theitem->update_insert_item();
         if($result->error==true){
-            print_error($result->message);
+            throw new \moodle_exception($result->message);
             //what to do?
 
         }
@@ -167,7 +170,12 @@ class qtype_minispeak extends question_type {
     }
 
     public function get_possible_responses($questiondata) {
-        return[];
+        // The same classes as qtype_minispeak_question::classify_response().
+        return [$questiondata->id => [
+            1 => new question_possible_response(get_string('fullycompleted', 'qtype_minispeak'), 1),
+            0 => new question_possible_response(get_string('partialcompleted', 'qtype_minispeak'), 0),
+            null => question_possible_response::no_response(),
+        ]];
     }
 
 

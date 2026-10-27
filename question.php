@@ -31,6 +31,10 @@ require_once($CFG->dirroot . '/question/type/questionbase.php');
 use \qtype_minispeak\constants;
 use qtype_minispeak\utils;
 
+/**
+ * A minispeak question. The item fields (constants::M_EXTRA_FIELDS) are copied onto it from the options.
+ */
+#[\AllowDynamicProperties]
 class qtype_minispeak_question extends question_graded_automatically {
 
     protected $secret;

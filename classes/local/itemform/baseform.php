@@ -98,6 +98,12 @@ abstract class baseform  {
     protected $standard = true;
 
     /**
+     * True to open the media prompts section when the form loads.
+     * @var bool
+     */
+    protected $expandmediaprompts = false;
+
+    /**
      * Each item type can and should override this to add any custom elements to
      * the basic form that they want
      */
@@ -228,6 +234,9 @@ abstract class baseform  {
 
         //add the media prompts chooser and fields
         $this->addElement('header', 'mediapromptsheading', get_string('mediaprompts', constants::M_COMPONENT));
+        if ($this->expandmediaprompts) {
+            $this->_form->setExpanded('mediapromptsheading');
+        }
         $this->add_media_prompts();
 
         //we need this in minilesson ... do we need this in minispeak???

@@ -108,7 +108,7 @@ class qtype_minispeak_edit_form extends question_edit_form {
         }
         $itemformclass  =utils::fetch_itemform_classname($itemtype);
         if(!$itemformclass){
-            print_error('No item type specified');
+            throw new \moodle_exception('No item type specified');
             return 0;
         }
         $itemform = new $itemformclass($mform,$itemtype,$qtype,'additemtypeoptionshere');
@@ -135,6 +135,7 @@ class qtype_minispeak_edit_form extends question_edit_form {
         //Setup our checkbox group initial values 
         //make sure the media upload fields are in the correct state
         $fs = get_file_storage();
+        $question->addmedia = 0;
         if(isset($question->id)) {
             $files = $fs->get_area_files($this->context->id, constants::M_COMPONENT, constants::MEDIAQUESTION, $question->id);
             if ($files) {

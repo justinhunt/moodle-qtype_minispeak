@@ -53,7 +53,7 @@ class helper
         }
 
         if (!$items = $DB->get_records(constants::M_QTABLE, array('minispeak' => $minispeak->id), $sort)) {
-            print_error("Could not fetch items for ordering");
+            throw new \moodle_exception("Could not fetch items for ordering");
             return;
         }
 
@@ -92,7 +92,7 @@ class helper
         
 
         if (!$item = $DB->get_record(constants::M_QTABLE, array('minispeak' => $minispeak->id, 'id'=>$itemid))) {
-            print_error("Could not fetch item for duplication");
+            throw new \moodle_exception("Could not fetch item for duplication");
             return;
         }
 
@@ -106,7 +106,7 @@ class helper
         
         //insert new record
         if (!$newitemid = $DB->insert_record(constants::M_QTABLE, $item)) {
-            print_error("Could not duplicate item");
+            throw new \moodle_exception("Could not duplicate item");
             return;
         }
 

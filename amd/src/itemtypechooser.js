@@ -53,7 +53,12 @@ export const init = () => {
 
     ]);
 
-    document.querySelector(Selectors.fields.selector).addEventListener('change', e => {
+    const selector = document.querySelector(Selectors.fields.selector);
+    if (!selector) {
+        // The form is not shown on this page, e.g. while a save redirects.
+        return;
+    }
+    selector.addEventListener('change', e => {
         const form = e.target.closest('form');
         const updateButton = form.querySelector(Selectors.fields.updateButton);
         const typeInstructions = form.querySelector(Selectors.fields.typeInstructions);
