@@ -30,5 +30,6 @@ $plugin->version   = 2026102700;
 $plugin->release   = '1.0.17 (Build 2026102700)';
 
 $plugin->requires  = 2016052300;
+$plugin->supported = [402, 503]; // Moodle 4.2 to 5.3.
 
 $plugin->maturity  = MATURITY_STABLE;
